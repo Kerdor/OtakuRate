@@ -1,4 +1,32 @@
 from dataclasses import dataclass
+from enum import StrEnum
+
+
+class RatingCriterion(StrEnum):
+    STORY = "story"
+    CHARACTERS = "characters"
+    EMOTIONS = "emotions"
+    INTEREST = "interest"
+    ATMOSPHERE = "atmosphere"
+    WORLD = "world"
+    DEVELOPMENT = "development"
+    VISUALS = "visuals"
+    SOUND = "sound"
+    AFTERTASTE = "aftertaste"
+
+
+ANIME_CRITERIA: tuple[RatingCriterion, ...] = (
+    RatingCriterion.STORY,
+    RatingCriterion.CHARACTERS,
+    RatingCriterion.EMOTIONS,
+    RatingCriterion.INTEREST,
+    RatingCriterion.ATMOSPHERE,
+    RatingCriterion.WORLD,
+    RatingCriterion.DEVELOPMENT,
+    RatingCriterion.VISUALS,
+    RatingCriterion.SOUND,
+    RatingCriterion.AFTERTASTE,
+)
 
 
 @dataclass(frozen=True)
