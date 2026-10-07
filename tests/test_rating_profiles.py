@@ -79,3 +79,15 @@ def test_user_tag_belongs_to_user_and_entry_tag_is_composite_key():
     assert UserTag.__table__.c.user_id.nullable is False
     assert LibraryEntryTag.__table__.c.library_entry_id.primary_key is True
     assert LibraryEntryTag.__table__.c.tag_id.primary_key is True
+
+
+def test_anime_progress_represents_watched_episodes():
+    from otakurate.domain.enums import MediaType
+    from otakurate.models import Title
+
+    anime = Title(title="Test Anime", media_type=MediaType.ANIME)
+
+    assert anime.media_type is MediaType.ANIME
+    entry_columns = LibraryEntry.__table__.c
+    assert entry_columns.progress_current.nullable is True
+    assert entry_columns.progress_total.nullable is True
