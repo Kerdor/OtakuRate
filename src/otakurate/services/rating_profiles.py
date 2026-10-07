@@ -71,13 +71,13 @@ def create_rating_profile_version(
 
 
 def profile_weights(session: Session, profile: RatingProfile) -> dict[str, float]:
-    rows = session.scalars(
-        select(RatingProfileCriterion)
-        .join(RatingCriterion, RatingCriterion.id == RatingProfileCriterion.criterion_id)
+    rows = session.execute(
+        select(RatingCriterion.key, RatingProfileCriterion.weight)
+        .join(RatingProfileCriterion, RatingProfileCriterion.criterion_id == RatingCriterion.id)
         .where(
             RatingProfileCriterion.profile_id == profile.id,
             RatingProfileCriterion.enabled.is_(True),
         )
         .order_by(RatingProfileCriterion.order_index)
     )
-    return {row.criterion.key: row.weight for row in rows}
+    return {key: weight for key, weight in rows}
