@@ -110,3 +110,11 @@ def test_progress_total_uses_maximum_confirmed_source_value():
 
     assert resolve_progress_total([12, 10, None, 8]) == 12
     assert resolve_progress_total([None, 0, -1]) is None
+
+
+
+def test_library_entry_has_added_at_timestamp():
+    columns = LibraryEntry.__table__.c
+
+    assert columns.created_at.nullable is False
+    assert columns.created_at.type.__class__.__name__ == "DateTime"
