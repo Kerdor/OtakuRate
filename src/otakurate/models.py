@@ -49,6 +49,12 @@ class ExternalSource(Base):
 
 class ExternalTitle(Base):
     __tablename__ = "external_titles"
+    __table_args__ = (
+        UniqueConstraint(
+            "source_id", "external_id",
+            name="uq_external_titles_source_external_id",
+        ),
+    )
     id: Mapped[int] = mapped_column(primary_key=True)
     title_id: Mapped[int] = mapped_column(ForeignKey("titles.id"), nullable=False)
     source_id: Mapped[int] = mapped_column(ForeignKey("external_sources.id"), nullable=False)
@@ -120,6 +126,12 @@ class FranchiseTitle(Base):
 
 class UserExternalAccount(Base):
     __tablename__ = "user_external_accounts"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "source_id",
+            name="uq_user_external_accounts_user_source",
+        ),
+    )
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     source_id: Mapped[int] = mapped_column(ForeignKey("external_sources.id"), nullable=False)
