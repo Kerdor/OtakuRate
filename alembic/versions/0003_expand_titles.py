@@ -16,7 +16,7 @@ depends_on = None
 def upgrade() -> None:
     with op.batch_alter_table("titles") as batch_op:
         batch_op.add_column(
-            sa.Column("alternative_titles", sa.JSON(), nullable=False)
+            sa.Column("alternative_titles", sa.JSON(), nullable=False, server_default="[]")
         )
         batch_op.add_column(sa.Column("description", sa.Text(), nullable=True))
         batch_op.add_column(
@@ -37,9 +37,9 @@ def upgrade() -> None:
                 nullable=True,
             )
         )
-        batch_op.add_column(sa.Column("genres", sa.JSON(), nullable=False))
-        batch_op.add_column(sa.Column("tags", sa.JSON(), nullable=False))
-        batch_op.add_column(sa.Column("metadata", sa.JSON(), nullable=False))
+        batch_op.add_column(sa.Column("genres", sa.JSON(), nullable=False, server_default="[]"))
+        batch_op.add_column(sa.Column("tags", sa.JSON(), nullable=False, server_default="[]"))
+        batch_op.add_column(sa.Column("metadata", sa.JSON(), nullable=False, server_default="{}"))
         batch_op.drop_column("external_ids")
 
 
