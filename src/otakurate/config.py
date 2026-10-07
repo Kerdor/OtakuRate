@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     )
 
     environment: Environment = "dev"
-    database_url: str = "sqlite:///./otakurate.db"
+    database_url: str | None = None
     host: str = "127.0.0.1"
     port: int = Field(default=8000, ge=1, le=65535)
     debug: bool = False
@@ -26,13 +26,19 @@ class Settings(BaseSettings):
     def validate_environment(self) -> "Settings":
         if self.environment == "test":
             self.database_url = "sqlite:///:memory:"
+            self.debug = False
+            return self
 
         if self.environment == "prod":
-            if not self.database_url.strip():
+            if not self.database_url or not self.database_url.strip():
                 raise ValueError(
                     "OTAKURATE_DATABASE_URL is required in production."
                 )
             self.debug = False
+            return self
+
+        if not self.database_url:
+            self.database_url = "sqlite:///./otakurate.db"
 
         return self
 
