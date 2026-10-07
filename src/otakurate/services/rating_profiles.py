@@ -81,3 +81,45 @@ def profile_weights(session: Session, profile: RatingProfile) -> dict[str, float
         .order_by(RatingProfileCriterion.order_index)
     )
     return {key: weight for key, weight in rows}
+
+def recalculate_user_rating(session: Session, rating_id: int):
+    from ..models import Title, UserRating
+    from ..rating import calculate_rating
+
+    user_rating = session.get(UserRating, rating_id)
+    if user_rating is None:
+        raise ValueError("User rating was not found.")
+
+    title = session.get(Title, user_rating.title_id)
+    if title is None:
+        raise ValueError("Title was not found.")
+
+    profile = session.scalar(
+        select(RatingProfile)
+        .where(
+            RatingProfile.user_id == user_rating.user_id,
+            RatingProfile.media_type == title.media_type,
+        )
+        .order_by(RatingProfile.version.desc())
+    )
+    if profile is None:
+        profile = session.scalar(
+            select(RatingProfile)
+            .where(
+                RatingProfile.user_id.is_(None),
+                RatingProfile.media_type == title.media_type,
+                RatingProfile.is_default.is_(True),
+            )
+            .order_by(RatingProfile.version.desc())
+        )
+    if profile is None:
+        raise ValueError("No rating profile is available for this media type.")
+
+    weights = profile_weights(session, profile)
+    criteria = {key: user_rating.criteria_values[key] for key in weights if key in user_rating.criteria_values}
+    if set(criteria) != set(weights):
+        raise ValueError("The rating does not contain all criteria required by the current profile.")
+
+    user_rating.overall_rating = calculate_rating(criteria, weights)
+    user_rating.rating_profile_version = profile.version
+    return user_rating
