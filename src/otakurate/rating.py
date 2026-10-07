@@ -285,4 +285,4 @@ def calculate_rating(criteria: dict[str, int], weights: dict[str, float] | None 
         raise ValueError("Weights must be positive.")
     total_weight = sum(weights.values())
     weighted_average = sum(validated[name] * weights[name] for name in validated) / total_weight
-    return round(weighted_average)
+    return int(weighted_average + 0.5)
