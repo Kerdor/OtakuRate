@@ -1,1 +1,0 @@
-"""OtakuRate application package."""
