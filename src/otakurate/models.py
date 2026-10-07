@@ -5,7 +5,7 @@ from sqlalchemy import CheckConstraint, JSON, Date, DateTime, Enum, ForeignKey, 
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
-from .domain.enums import LibraryStatus, MediaType
+from .domain.enums import MediaType
 
 
 class ReleaseStatus(StrEnum):
@@ -178,6 +178,34 @@ class RatingProfileCriterion(Base):
     order_index: Mapped[int] = mapped_column(nullable=False)
     enabled: Mapped[bool] = mapped_column(default=True, nullable=False)
 
+class UserList(Base):
+    __tablename__ = "user_lists"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "media_type", "name",
+            name="uq_user_lists_user_media_name",
+        ),
+        UniqueConstraint(
+            "user_id", "media_type", "system_key",
+            name="uq_user_lists_user_media_system_key",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    media_type: Mapped[MediaType] = mapped_column(
+        Enum(MediaType, name="userlistmediatype"),
+        nullable=False,
+    )
+    name: Mapped[str] = mapped_column(String(128), nullable=False)
+    system_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    is_system: Mapped[bool] = mapped_column(default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+
 class LibraryEntry(Base):
     __tablename__ = "library_entries"
     __table_args__ = (
@@ -190,13 +218,50 @@ class LibraryEntry(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     title_id: Mapped[int] = mapped_column(ForeignKey("titles.id"), nullable=False)
-    status: Mapped[LibraryStatus] = mapped_column(
-        Enum(LibraryStatus, name="librarystatus"),
+    list_id: Mapped[int] = mapped_column(
+        ForeignKey("user_lists.id"),
         nullable=False,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
+    )
+
+
+class UserTag(Base):
+    __tablename__ = "user_tags"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "name",
+            name="uq_user_tags_user_name",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    name: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+
+class LibraryEntryTag(Base):
+    __tablename__ = "library_entry_tags"
+    __table_args__ = (
+        UniqueConstraint(
+            "library_entry_id", "tag_id",
+            name="uq_library_entry_tags_entry_tag",
+        ),
+    )
+
+    library_entry_id: Mapped[int] = mapped_column(
+        ForeignKey("library_entries.id"),
+        primary_key=True,
+    )
+    tag_id: Mapped[int] = mapped_column(
+        ForeignKey("user_tags.id"),
+        primary_key=True,
     )
 
 
