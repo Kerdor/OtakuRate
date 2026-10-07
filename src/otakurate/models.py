@@ -57,7 +57,7 @@ class ExternalTitle(Base):
     media_type: Mapped[MediaType | None] = mapped_column(Enum(MediaType, name="mediatype"), nullable=True)
     external_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
     alternative_titles: Mapped[list] = mapped_column(JSON, default=list)
-    metadata: Mapped[dict] = mapped_column(JSON, default=dict)
+    extra_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
 
 
 class MatchStatus(StrEnum):
@@ -106,7 +106,7 @@ class Franchise(Base):
     __tablename__ = "franchises"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    metadata: Mapped[dict] = mapped_column(JSON, default=dict)
+    extra_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
 
 
 class FranchiseTitle(Base):
