@@ -1,5 +1,14 @@
 from otakurate.database import Base
-from otakurate.models import LibraryEntry, RatingCriterion, RatingProfile, RatingProfileCriterion, UserRating
+from otakurate.models import (
+    LibraryEntry,
+    RatingCriterion,
+    RatingProfile,
+    RatingProfileCriterion,
+    UserList,
+    UserRating,
+    UserTag,
+    LibraryEntryTag,
+)
 
 
 def test_rating_profile_tables_are_registered():
@@ -27,11 +36,17 @@ def test_user_rating_stores_profile_version():
 def test_rating_criterion_key_is_unique():
     assert RatingCriterion.__table__.c.key.unique is True
 
-def test_library_entry_is_registered():
+
+def test_library_models_are_registered():
     assert "library_entries" in Base.metadata.tables
+    assert "user_lists" in Base.metadata.tables
+    assert "user_tags" in Base.metadata.tables
+    assert "library_entry_tags" in Base.metadata.tables
 
 
-def test_library_entry_has_user_title_unique_constraint():
+def test_library_entry_has_user_title_unique_constraint_and_list():
+    columns = LibraryEntry.__table__.c
+    assert columns.list_id.nullable is False
     constraints = LibraryEntry.__table__.constraints
     assert any(
         constraint.name == "uq_library_entries_user_title"
@@ -39,15 +54,14 @@ def test_library_entry_has_user_title_unique_constraint():
     )
 
 
-def test_library_status_enum_has_expected_values():
-    from otakurate.domain.enums import LibraryStatus
+def test_user_list_has_media_type_and_system_metadata():
+    columns = UserList.__table__.c
+    assert columns.media_type.nullable is False
+    assert columns.name.nullable is False
+    assert columns.is_system.nullable is False
 
-    assert [status.value for status in LibraryStatus] == [
-        "watching", "reading", "completed", "planned", "paused", "dropped",
-    ]
 
-
-def test_library_entry_has_status():
-    from otakurate.models import LibraryEntry
-
-    assert LibraryEntry.__table__.c.status.nullable is False
+def test_user_tag_belongs_to_user_and_entry_tag_is_composite_key():
+    assert UserTag.__table__.c.user_id.nullable is False
+    assert LibraryEntryTag.__table__.c.library_entry_id.primary_key is True
+    assert LibraryEntryTag.__table__.c.tag_id.primary_key is True
