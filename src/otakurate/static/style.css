@@ -1,0 +1,16 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: #111;
+    color: #eee;
+}
+
+.page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
