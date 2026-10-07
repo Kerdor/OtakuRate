@@ -75,6 +75,29 @@ class ExternalTitle(Base):
     metadata: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
+class MatchStatus(StrEnum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    REJECTED = "rejected"
+
+
+class TitleMatchCandidate(Base):
+    __tablename__ = "title_match_candidates"
+    __table_args__ = (
+        UniqueConstraint("source_id", "external_id", "candidate_title_id",
+                         name="uq_title_match_candidates_source_external_title"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    source_id: Mapped[int] = mapped_column(ForeignKey("external_sources.id"), nullable=False)
+    external_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    candidate_title_id: Mapped[int | None] = mapped_column(ForeignKey("titles.id"), nullable=True)
+    confidence: Mapped[float | None] = mapped_column(nullable=True)
+    status: Mapped[MatchStatus] = mapped_column(
+        Enum(MatchStatus, name="matchstatus"), default=MatchStatus.PENDING, nullable=False
+    )
+    evidence: Mapped[dict] = mapped_column(JSON, default=dict)
+
 class TitleRelationType(StrEnum):
     ADAPTATION = "adaptation"
     SEASON = "season"
