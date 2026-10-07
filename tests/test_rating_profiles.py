@@ -103,3 +103,10 @@ def test_manga_progress_represents_read_chapters():
     entry_columns = LibraryEntry.__table__.c
     assert entry_columns.progress_current.nullable is True
     assert entry_columns.progress_total.nullable is True
+
+
+def test_progress_total_uses_maximum_confirmed_source_value():
+    from otakurate.domain.progress import resolve_progress_total
+
+    assert resolve_progress_total([12, 10, None, 8]) == 12
+    assert resolve_progress_total([None, 0, -1]) is None
