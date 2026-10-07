@@ -1,5 +1,5 @@
 from otakurate.database import Base
-from otakurate.models import RatingCriterion, RatingProfile, RatingProfileCriterion, UserRating
+from otakurate.models import LibraryEntry, RatingCriterion, RatingProfile, RatingProfileCriterion, UserRating
 
 
 def test_rating_profile_tables_are_registered():
@@ -26,3 +26,14 @@ def test_user_rating_stores_profile_version():
 
 def test_rating_criterion_key_is_unique():
     assert RatingCriterion.__table__.c.key.unique is True
+
+def test_library_entry_is_registered():
+    assert "library_entries" in Base.metadata.tables
+
+
+def test_library_entry_has_user_title_unique_constraint():
+    constraints = LibraryEntry.__table__.constraints
+    assert any(
+        constraint.name == "uq_library_entries_user_title"
+        for constraint in constraints
+    )
