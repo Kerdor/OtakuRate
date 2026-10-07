@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import text
+import pytest
+from sqlalchemy.exc import IntegrityError
 
 from otakurate.database import Base, SessionLocal
 from otakurate.models import User
@@ -25,11 +26,7 @@ def test_user_username_is_unique():
     with SessionLocal.begin() as session:
         session.add(User(username="unique-user"))
 
-    with SessionLocal.begin() as session:
-        session.add(User(username="unique-user"))
-        try:
+    with pytest.raises(IntegrityError):
+        with SessionLocal.begin() as session:
+            session.add(User(username="unique-user"))
             session.flush()
-        except Exception:
-            return
-
-    raise AssertionError("Duplicate usernames must be rejected.")
