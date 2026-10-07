@@ -35,7 +35,7 @@ function render() {
             </div>
             <input id="criterion-${key}" type="checkbox" checked hidden>
             <input class="rating-slider" data-key="${key}" type="range" min="1" max="10" step="1" value="5" aria-label="${criterion.name}">
-            <div class="slider-scale"><span>1</span><span>5</span><span>10</span></div>
+            <div class="slider-scale"><span>1</span><span>10</span></div>
             <p class="score-description" id="score-${key}">${criterion.scores[4]}</p>
             <div class="criterion-meta">Вес: ${criterion.weight.toFixed(1)} · Влияние: <span id="impact-${key}">0.0</span></div>
         `;
