@@ -47,9 +47,23 @@ def test_library_models_are_registered():
 def test_library_entry_has_user_title_unique_constraint_and_list():
     columns = LibraryEntry.__table__.c
     assert columns.list_id.nullable is False
+    assert columns.progress_current.nullable is True
+    assert columns.progress_total.nullable is True
     constraints = LibraryEntry.__table__.constraints
     assert any(
         constraint.name == "uq_library_entries_user_title"
+        for constraint in constraints
+    )
+    assert any(
+        constraint.name == "ck_library_entries_progress_current_nonnegative"
+        for constraint in constraints
+    )
+    assert any(
+        constraint.name == "ck_library_entries_progress_total_positive"
+        for constraint in constraints
+    )
+    assert any(
+        constraint.name == "ck_library_entries_progress_not_over_total"
         for constraint in constraints
     )
 
