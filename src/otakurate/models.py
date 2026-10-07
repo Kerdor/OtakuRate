@@ -225,6 +225,18 @@ class LibraryEntry(Base):
             "user_id", "title_id",
             name="uq_library_entries_user_title",
         ),
+        CheckConstraint(
+            "progress_current IS NULL OR progress_current >= 0",
+            name="ck_library_entries_progress_current_nonnegative",
+        ),
+        CheckConstraint(
+            "progress_total IS NULL OR progress_total > 0",
+            name="ck_library_entries_progress_total_positive",
+        ),
+        CheckConstraint(
+            "progress_current IS NULL OR progress_total IS NULL OR progress_current <= progress_total",
+            name="ck_library_entries_progress_not_over_total",
+        ),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
