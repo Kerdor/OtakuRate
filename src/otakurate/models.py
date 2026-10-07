@@ -44,3 +44,49 @@ class User(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
+
+
+class ExternalSource(Base):
+    __tablename__ = "external_sources"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    key: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(128))
+    base_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+
+
+class ExternalTitle(Base):
+    __tablename__ = "external_titles"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title_id: Mapped[int] = mapped_column(nullable=False)
+    source_id: Mapped[int] = mapped_column(nullable=False)
+    external_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+    media_type: Mapped[MediaType | None] = mapped_column(
+        Enum(MediaType, name="mediatype"),
+        nullable=True,
+    )
+    external_title: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+    alternative_titles: Mapped[list] = mapped_column(JSON, default=list)
+    metadata: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class UserExternalAccount(Base):
+    __tablename__ = "user_external_accounts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(nullable=False)
+    source_id: Mapped[int] = mapped_column(nullable=False)
+    external_user_id: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+    external_username: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+    settings: Mapped[dict] = mapped_column(JSON, default=dict)
