@@ -178,6 +178,24 @@ class RatingProfileCriterion(Base):
     order_index: Mapped[int] = mapped_column(nullable=False)
     enabled: Mapped[bool] = mapped_column(default=True, nullable=False)
 
+class LibraryEntry(Base):
+    __tablename__ = "library_entries"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "title_id",
+            name="uq_library_entries_user_title",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    title_id: Mapped[int] = mapped_column(ForeignKey("titles.id"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+
 class UserRating(Base):
     __tablename__ = "user_ratings"
     __table_args__ = (
