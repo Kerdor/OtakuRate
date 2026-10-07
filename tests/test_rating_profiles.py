@@ -37,3 +37,17 @@ def test_library_entry_has_user_title_unique_constraint():
         constraint.name == "uq_library_entries_user_title"
         for constraint in constraints
     )
+
+
+def test_library_status_enum_has_expected_values():
+    from otakurate.domain.enums import LibraryStatus
+
+    assert [status.value for status in LibraryStatus] == [
+        "watching", "reading", "completed", "planned", "paused", "dropped",
+    ]
+
+
+def test_library_entry_has_status():
+    from otakurate.models import LibraryEntry
+
+    assert LibraryEntry.__table__.c.status.nullable is False
