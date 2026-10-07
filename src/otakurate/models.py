@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timezone\nfrom enum import StrEnum
 
 from sqlalchemy import JSON, Date, DateTime, Enum, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -7,7 +7,7 @@ from .database import Base
 from .domain.enums import MediaType
 
 
-class ReleaseStatus(str, __import__("enum").Enum):
+class ReleaseStatus(StrEnum):
     UPCOMING = "upcoming"
     ONGOING = "ongoing"
     FINISHED = "finished"
