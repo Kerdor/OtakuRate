@@ -5,7 +5,7 @@ from sqlalchemy import CheckConstraint, JSON, Date, DateTime, Enum, ForeignKey, 
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
-from .domain.enums import MediaType
+from .domain.enums import LibraryStatus, MediaType
 
 
 class ReleaseStatus(StrEnum):
@@ -190,6 +190,10 @@ class LibraryEntry(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     title_id: Mapped[int] = mapped_column(ForeignKey("titles.id"), nullable=False)
+    status: Mapped[LibraryStatus] = mapped_column(
+        Enum(LibraryStatus, name="librarystatus"),
+        nullable=False,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
