@@ -13,5 +13,5 @@ def test_session_can_begin_transaction():
         assert session.execute(text("SELECT 1")).scalar_one() == 1
 
 
-def test_base_starts_without_domain_tables():
-    assert Base.metadata.tables == {}
+def test_base_contains_current_domain_tables():
+    assert "titles" in Base.metadata.tables
