@@ -209,7 +209,7 @@
 
 # 4. Статусы и личная библиотека
 
-- [ ] 4.1. Модель `LibraryEntry` как центральной связи `User → LibraryEntry → Title`.
+- [x] 4.1. Модель `LibraryEntry` как центральной связи `User → LibraryEntry → Title`.
 - [ ] 4.2. Статусы:
   - watching/reading
   - completed
