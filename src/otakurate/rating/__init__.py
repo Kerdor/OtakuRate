@@ -1,1 +1,0 @@
-"""Rating system package."""
