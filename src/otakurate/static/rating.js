@@ -64,7 +64,7 @@ function calculateImpact(changedKey) {
 
 saveDraft.addEventListener('click', async () => {
     if (!userId || !titleId) {
-        localStorage.setItem(\`otakurate-rating-\${data.media_type}-\${data.title}\`, JSON.stringify(values));
+        localStorage.setItem(`otakurate-rating-\${data.media_type}-\${data.title}`, JSON.stringify(values));
         saveStatus.textContent = 'Черновик сохранён в браузере';
         return;
     }
@@ -83,7 +83,7 @@ saveDraft.addEventListener('click', async () => {
         });
         const result = await response.json();
         if (!response.ok) throw new Error(result.detail || 'Не удалось сохранить оценку');
-        saveStatus.textContent = \`Сохранено: итоговая оценка \${result.overall_rating}\`;
+        saveStatus.textContent = `Сохранено: итоговая оценка \${result.overall_rating}`;
     } catch (error) {
         saveStatus.textContent = error.message;
     } finally {
