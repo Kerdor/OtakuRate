@@ -1,4 +1,29 @@
-from otakurate.rating import calculate_rating, validate_criteria, validate_rating
+from otakurate.rating import (
+    ANIME_CRITERIA,
+    RatingCriterion,
+    calculate_rating,
+    validate_criteria,
+    validate_rating,
+)
+
+
+def test_anime_has_ten_criteria_in_expected_order():
+    assert ANIME_CRITERIA == (
+        RatingCriterion.STORY,
+        RatingCriterion.CHARACTERS,
+        RatingCriterion.EMOTIONS,
+        RatingCriterion.INTEREST,
+        RatingCriterion.ATMOSPHERE,
+        RatingCriterion.WORLD,
+        RatingCriterion.DEVELOPMENT,
+        RatingCriterion.VISUALS,
+        RatingCriterion.SOUND,
+        RatingCriterion.AFTERTASTE,
+    )
+
+
+def test_anime_criteria_are_unique():
+    assert len(ANIME_CRITERIA) == len(set(ANIME_CRITERIA))
 
 
 def test_rating_accepts_only_integer_values_from_one_to_ten():
