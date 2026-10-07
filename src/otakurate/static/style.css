@@ -1,16 +1,25 @@
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: system-ui, sans-serif;
-    background: #111;
-    color: #eee;
-}
-
-.page {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 40px 20px;
-}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; background: #111; color: #eee; }
+.page { max-width: 1000px; margin: 0 auto; padding: 32px 20px 60px; }
+.back-link { color: #aaa; text-decoration: none; }
+.back-link:hover { color: #fff; }
+.rating-header { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; margin: 28px 0; }
+.eyebrow { margin: 0 0 6px; font-size: 12px; letter-spacing: .12em; color: #888; }
+h1 { margin: 0 0 8px; font-size: clamp(28px, 5vw, 42px); }
+.muted { color: #999; }
+.overall-card { min-width: 110px; padding: 16px; border: 1px solid #333; border-radius: 14px; text-align: center; }
+.overall-card span { display: block; color: #999; font-size: 13px; }
+.overall-card strong { display: block; font-size: 42px; line-height: 1; margin-top: 6px; }
+.criteria-list { display: grid; gap: 14px; }
+.criterion-card { padding: 20px; border: 1px solid #2d2d2d; border-radius: 14px; background: #181818; }
+.criterion-top { display: flex; justify-content: space-between; gap: 16px; }
+.criterion-top h2 { margin: 0 0 5px; font-size: 20px; }
+.criterion-top p { margin: 0; color: #aaa; font-size: 14px; }
+.criterion-value { font-size: 28px; min-width: 36px; text-align: right; }
+.rating-slider { width: 100%; margin: 22px 0 6px; accent-color: #eee; cursor: pointer; }
+.slider-scale { display: flex; justify-content: space-between; color: #777; font-size: 12px; }
+.score-description { min-height: 40px; margin: 12px 0 6px; color: #ddd; font-size: 14px; }
+.criterion-meta { color: #777; font-size: 12px; }
+.rating-actions { display: flex; align-items: center; gap: 14px; margin-top: 20px; }
+button { border: 0; border-radius: 10px; padding: 11px 16px; background: #eee; color: #111; cursor: pointer; font: inherit; }
+@media (max-width: 650px) { .rating-header { flex-direction: column; } .overall-card { width: 100%; } .criterion-card { padding: 16px; } }
