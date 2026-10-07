@@ -1,9 +1,8 @@
-from enum import StrEnum
-
 from sqlalchemy import JSON, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
+from .domain.enums import MediaType
 
 
 class MediaType(StrEnum):
