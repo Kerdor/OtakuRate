@@ -234,6 +234,8 @@ class LibraryEntry(Base):
         ForeignKey("user_lists.id"),
         nullable=False,
     )
+    progress_current: Mapped[int | None] = mapped_column(nullable=True)
+    progress_total: Mapped[int | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
