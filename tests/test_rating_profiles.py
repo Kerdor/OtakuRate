@@ -91,3 +91,15 @@ def test_anime_progress_represents_watched_episodes():
     entry_columns = LibraryEntry.__table__.c
     assert entry_columns.progress_current.nullable is True
     assert entry_columns.progress_total.nullable is True
+
+
+def test_manga_progress_represents_read_chapters():
+    from otakurate.domain.enums import MediaType
+    from otakurate.models import Title
+
+    manga = Title(title="Test Manga", media_type=MediaType.MANGA)
+
+    assert manga.media_type is MediaType.MANGA
+    entry_columns = LibraryEntry.__table__.c
+    assert entry_columns.progress_current.nullable is True
+    assert entry_columns.progress_total.nullable is True
