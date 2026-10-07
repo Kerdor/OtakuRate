@@ -3,6 +3,9 @@ const list = document.querySelector('#criteria-list');
 const overall = document.querySelector('#overall-rating');
 const saveDraft = document.querySelector('#save-draft');
 const saveStatus = document.querySelector('#save-status');
+const params = new URLSearchParams(window.location.search);
+const userId = params.get('user_id');
+const titleId = params.get('title_id');
 
 document.querySelector('#title').textContent = data.title;
 document.querySelector('#media-type').textContent = data.media_type === 'anime' ? 'АНИМЕ' : 'МАНГА / МАНХВА';
@@ -59,9 +62,33 @@ function calculateImpact(changedKey) {
     document.querySelector(`#impact-${changedKey}`).textContent = impact.toFixed(1);
 }
 
-saveDraft.addEventListener('click', () => {
-    localStorage.setItem(`otakurate-rating-${data.media_type}-${data.title}`, JSON.stringify(values));
-    saveStatus.textContent = 'Черновик сохранён в браузере';
+saveDraft.addEventListener('click', async () => {
+    if (!userId || !titleId) {
+        localStorage.setItem(\`otakurate-rating-\${data.media_type}-\${data.title}\`, JSON.stringify(values));
+        saveStatus.textContent = 'Черновик сохранён в браузере';
+        return;
+    }
+    saveDraft.disabled = true;
+    saveStatus.textContent = 'Сохранение...';
+    try {
+        const response = await fetch('/api/ratings', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                user_id: Number(userId),
+                title_id: Number(titleId),
+                media_type: data.media_type,
+                criteria_values: values,
+            }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || 'Не удалось сохранить оценку');
+        saveStatus.textContent = \`Сохранено: итоговая оценка \${result.overall_rating}\`;
+    } catch (error) {
+        saveStatus.textContent = error.message;
+    } finally {
+        saveDraft.disabled = false;
+    }
 });
 
 render();
