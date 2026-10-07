@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Оценка — OtakuRate</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <main class="page rating-page">
+        <a class="back-link" href="/">← Назад</a>
+        <header class="rating-header">
+            <div>
+                <p class="eyebrow" id="media-type">АНИМЕ</p>
+                <h1 id="title">Новый тайтл</h1>
+                <p class="muted">Оцени каждый критерий от 1 до 10. Итог пересчитывается сразу.</p>
+            </div>
+            <div class="overall-card">
+                <span>Итог</span>
+                <strong id="overall-rating">5</strong>
+            </div>
+        </header>
+        <section id="criteria-list" class="criteria-list" aria-label="Критерии оценки"></section>
+        <div class="rating-actions">
+            <button id="save-draft" type="button">Сохранить черновик</button>
+            <span id="save-status" class="muted"></span>
+        </div>
+    </main>
+    <script src="/static/rating.js"></script>
+</body>
+</html>
