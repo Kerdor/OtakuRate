@@ -28,7 +28,7 @@ class Title(Base):
     release_status: Mapped[ReleaseStatus | None] = mapped_column(Enum(ReleaseStatus, name="releasestatus"), nullable=True)
     genres: Mapped[list] = mapped_column(JSON, default=list)
     tags: Mapped[list] = mapped_column(JSON, default=list)
-    metadata: Mapped[dict] = mapped_column(JSON, default=dict)
+    extra_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
 
 
 class User(Base):
