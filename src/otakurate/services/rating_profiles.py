@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..domain.enums import MediaType
 from ..models import RatingCriterion, RatingProfile, RatingProfileCriterion
-from ..rating import ANIME_CRITERIA, MANGA_CRITERIA, RatingCriterion as RatingCriterionKey
+from ..rating import ANIME_CRITERIA, MANGA_CRITERIA
 
 
 def create_rating_profile_version(
