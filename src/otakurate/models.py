@@ -1,6 +1,6 @@
 from datetime import date, datetime, timezone\nfrom enum import StrEnum
 
-from sqlalchemy import JSON, Date, DateTime, Enum, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import CheckConstraint, JSON, Date, DateTime, Enum, ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
@@ -74,6 +74,56 @@ class ExternalTitle(Base):
     alternative_titles: Mapped[list] = mapped_column(JSON, default=list)
     metadata: Mapped[dict] = mapped_column(JSON, default=dict)
 
+
+class TitleRelationType(StrEnum):
+    ADAPTATION = "adaptation"
+    SEASON = "season"
+    SEQUEL = "sequel"
+    PREQUEL = "prequel"
+    SPIN_OFF = "spin_off"
+    SIDE_STORY = "side_story"
+    ALTERNATIVE = "alternative"
+    RELATED = "related"
+
+
+class TitleRelation(Base):
+    __tablename__ = "title_relations"
+    __table_args__ = (
+        CheckConstraint("source_title_id != target_title_id", name="ck_title_relations_not_self"),
+        UniqueConstraint(
+            "source_title_id", "target_title_id", "relation_type",
+            name="uq_title_relations_source_target_type",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    source_title_id: Mapped[int] = mapped_column(ForeignKey("titles.id"), nullable=False)
+    target_title_id: Mapped[int] = mapped_column(ForeignKey("titles.id"), nullable=False)
+    relation_type: Mapped[TitleRelationType] = mapped_column(
+        Enum(TitleRelationType, name="titlerelationtype"),
+        nullable=False,
+    )
+    order_index: Mapped[int | None] = mapped_column(nullable=True)
+
+
+class Franchise(Base):
+    __tablename__ = "franchises"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    metadata: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class FranchiseTitle(Base):
+    __tablename__ = "franchise_titles"
+    __table_args__ = (
+        UniqueConstraint("franchise_id", "title_id", name="uq_franchise_titles_franchise_title"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    franchise_id: Mapped[int] = mapped_column(ForeignKey("franchises.id"), nullable=False)
+    title_id: Mapped[int] = mapped_column(ForeignKey("titles.id"), nullable=False)
+    order_index: Mapped[int | None] = mapped_column(nullable=True)
 
 class UserExternalAccount(Base):
     __tablename__ = "user_external_accounts"
