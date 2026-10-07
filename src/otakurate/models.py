@@ -128,6 +128,56 @@ class UserExternalAccount(Base):
     settings: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
+class RatingCriterion(Base):
+    __tablename__ = "rating_criteria"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    key: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(128), nullable=False)
+
+
+class RatingProfile(Base):
+    __tablename__ = "rating_profiles"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "media_type", "profile_key", "version",
+            name="uq_rating_profiles_user_media_key_version",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    media_type: Mapped[MediaType] = mapped_column(
+        Enum(MediaType, name="ratingprofilemediatype"), nullable=False
+    )
+    profile_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    name: Mapped[str] = mapped_column(String(128), nullable=False)
+    version: Mapped[int] = mapped_column(nullable=False)
+    is_default: Mapped[bool] = mapped_column(default=False, nullable=False)
+
+
+class RatingProfileCriterion(Base):
+    __tablename__ = "rating_profile_criteria"
+    __table_args__ = (
+        UniqueConstraint(
+            "profile_id", "criterion_id",
+            name="uq_rating_profile_criteria_profile_criterion",
+        ),
+        UniqueConstraint(
+            "profile_id", "order_index",
+            name="uq_rating_profile_criteria_profile_order",
+        ),
+        CheckConstraint("weight > 0", name="ck_rating_profile_criteria_weight_positive"),
+        CheckConstraint("order_index >= 0", name="ck_rating_profile_criteria_order_nonnegative"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("rating_profiles.id"), nullable=False)
+    criterion_id: Mapped[int] = mapped_column(ForeignKey("rating_criteria.id"), nullable=False)
+    weight: Mapped[float] = mapped_column(nullable=False)
+    order_index: Mapped[int] = mapped_column(nullable=False)
+    enabled: Mapped[bool] = mapped_column(default=True, nullable=False)
+
 class UserRating(Base):
     __tablename__ = "user_ratings"
     __table_args__ = (
@@ -139,5 +189,6 @@ class UserRating(Base):
     title_id: Mapped[int] = mapped_column(ForeignKey("titles.id"), nullable=False)
     overall_rating: Mapped[int] = mapped_column(nullable=False)
     criteria_values: Mapped[dict] = mapped_column(JSON, default=dict)
+    rating_profile_version: Mapped[int] = mapped_column(nullable=False, default=1)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
