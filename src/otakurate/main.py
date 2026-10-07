@@ -1,17 +1,10 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+
+from .web.api.router import router as api_router
+from .web.pages.index import router as pages_router
 
 app = FastAPI(title="OtakuRate")
 app.mount("/static", StaticFiles(directory="src/otakurate/static"), name="static")
-templates = Jinja2Templates(directory="src/otakurate/templates")
-
-
-@app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={},
-    )
+app.include_router(pages_router)
+app.include_router(api_router)
