@@ -20,7 +20,7 @@ def test_title_supports_anime_metadata():
         release_status=ReleaseStatus.FINISHED,
         genres=["Action"],
         tags=["Original"],
-        metadata={"episodes": 12},
+        extra_metadata={"episodes": 12},
     )
 
     assert title.title == "Test Anime"
@@ -32,4 +32,4 @@ def test_title_supports_anime_metadata():
     assert title.release_status == ReleaseStatus.FINISHED
     assert title.genres == ["Action"]
     assert title.tags == ["Original"]
-    assert title.metadata == {"episodes": 12}
+    assert title.extra_metadata == {"episodes": 12}
