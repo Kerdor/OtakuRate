@@ -254,46 +254,10 @@ class LibraryEntry(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
-class LibraryEntry(Base):
-    __tablename__ = "library_entries"
-    __table_args__ = (
-        UniqueConstraint(
-            "user_id", "title_id",
-            name="uq_library_entries_user_title",
-        ),
-        CheckConstraint(
-            "progress_current IS NULL OR progress_current >= 0",
-            name="ck_library_entries_progress_current_nonnegative",
-        ),
-        CheckConstraint(
-            "progress_total IS NULL OR progress_total > 0",
-            name="ck_library_entries_progress_total_positive",
-        ),
-        CheckConstraint(
-            "progress_current IS NULL OR progress_total IS NULL OR progress_current <= progress_total",
-            name="ck_library_entries_progress_not_over_total",
-        ),
-    )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
-    )
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    title_id: Mapped[int] = mapped_column(ForeignKey("titles.id"), nullable=False)
-    list_id: Mapped[int] = mapped_column(
-        ForeignKey("user_lists.id"),
-        nullable=False,
-    )
-    progress_current: Mapped[int | None] = mapped_column(nullable=True)
-    progress_total: Mapped[int | None] = mapped_column(nullable=True)
-    completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
     )
 
 
