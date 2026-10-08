@@ -58,11 +58,30 @@
                     <a class="button-link" href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}&title_id={{ title.id }}{% if user_id %}&user_id={{ user_id }}{% endif %}">Оценить</a>
                 {% endif %}
 
+                {% if rating %}
+                    <section class="own-criteria">
+                        <h2>Критерии</h2>
+                        <dl class="criteria-values">
+                            {% for key, value in rating.criteria_values.items() %}
+                                <div><dt>{{ key }}</dt><dd>{{ value }}/10</dd></div>
+                            {% endfor %}
+                        </dl>
+                    </section>
+                {% endif %}
+
                 {% if user_id %}
                     <section class="library-add">
                         <h2>Моя библиотека</h2>
-                        <select id="library-list" aria-label="Список библиотеки"></select>
-                        <button id="library-add-button" type="button">Добавить в список</button>
+                        <label>Статус
+                            <select id="library-list" aria-label="Статус библиотеки"></select>
+                        </label>
+                        <label>Прогресс
+                            <input id="library-progress-current" type="number" min="0" placeholder="Текущий">
+                        </label>
+                        <label>Всего
+                            <input id="library-progress-total" type="number" min="1" placeholder="Всего">
+                        </label>
+                        <button id="library-add-button" type="button">Сохранить библиотеку</button>
                         <p id="library-status" class="muted" aria-live="polite"></p>
                     </section>
                 {% endif %}
