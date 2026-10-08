@@ -10,6 +10,7 @@ from ...services.title_search import search_titles
 from ...services.user_ratings import save_user_rating
 
 router = APIRouter(prefix="/ratings", tags=["ratings"])
+title_search_router = APIRouter(tags=["titles"])
 
 
 def get_session():
@@ -67,7 +68,7 @@ def upsert_rating(payload: RatingPayload, session: Session = Depends(get_session
 
 
 
-@router.get("/titles/search", response_model=list[dict])
+@title_search_router.get("/titles/search", response_model=list[dict])
 def search_title_endpoint(
     query: str,
     media_type: MediaType | None = None,
