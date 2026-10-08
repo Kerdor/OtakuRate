@@ -111,6 +111,7 @@ def get_lists_endpoint(
 ):
     if user_id is None:
         user_id = get_dev_user(session).id
+        session.commit()
     return [
         {"id": item.id, "name": item.name, "is_system": item.is_system}
         for item in get_user_lists(session, user_id=user_id, media_type=media_type)
@@ -183,6 +184,7 @@ def get_library_entry_endpoint(
 ):
     if user_id is None:
         user_id = get_dev_user(session).id
+        session.commit()
     entry = get_entry(session, user_id=user_id, title_id=title_id)
     if entry is None:
         raise HTTPException(status_code=404, detail="Library entry not found.")
