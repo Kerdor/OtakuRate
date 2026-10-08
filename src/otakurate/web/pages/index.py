@@ -68,16 +68,14 @@ async def title_card(request: Request, title_id: int):
             raise HTTPException(status_code=404, detail="Title not found.")
 
         rating = None
+        entry = None
         if user_id is not None:
-            rating = session.scalar(
-                select(UserRating).where(
-                    UserRating.user_id == user_id,
-                    UserRating.title_id == title.id,
-                )
-            )
+            rating = session.scalar(select(UserRating).where(UserRating.user_id == user_id, UserRating.title_id == title.id))
+            from ...models import LibraryEntry
+            entry = session.scalar(select(LibraryEntry).where(LibraryEntry.user_id == user_id, LibraryEntry.title_id == title.id))
 
         return templates.TemplateResponse(
             request=request,
             name="title.html",
-            context={"title": title, "rating": rating, "user_id": user_id},
+            context={"title": title, "rating": rating, "entry": entry, "user_id": user_id},
         )
