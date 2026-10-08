@@ -8,7 +8,7 @@ from ...domain.enums import MediaType
 from ...models import RatingProfile
 from ...services.title_search import search_titles
 from ...services.titles import create_title
-from ...services.library_entries import add_to_list, get_user_lists
+from ...services.library_entries import add_to_list, get_entry, get_user_lists, update_entry
 from ...services.user_ratings import save_user_rating
 
 router = APIRouter(prefix="/ratings", tags=["ratings"])
@@ -155,3 +155,59 @@ def search_title_endpoint(
             limit=limit,
         )
     ]
+
+
+class LibraryEntryUpdatePayload(BaseModel):
+    user_id: int
+    title_id: int
+    list_id: int | None = None
+    progress_current: int | None = None
+    progress_total: int | None = None
+    completed_at: datetime | None = None
+
+
+@title_search_router.get("/library/entry", response_model=dict)
+def get_library_entry_endpoint(
+    user_id: int,
+    title_id: int,
+    session: Session = Depends(get_session),
+):
+    entry = get_entry(session, user_id=user_id, title_id=title_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="Library entry not found.")
+    return {
+        "id": entry.id,
+        "list_id": entry.list_id,
+        "progress_current": entry.progress_current,
+        "progress_total": entry.progress_total,
+        "completed_at": entry.completed_at,
+        "notes": entry.notes,
+    }
+
+
+@title_search_router.put("/library/entry", response_model=dict)
+def update_library_entry_endpoint(
+    payload: LibraryEntryUpdatePayload,
+    session: Session = Depends(get_session),
+):
+    try:
+        entry = update_entry(
+            session,
+            user_id=payload.user_id,
+            title_id=payload.title_id,
+            list_id=payload.list_id,
+            progress_current=payload.progress_current,
+            progress_total=payload.progress_total,
+            completed_at=payload.completed_at,
+        )
+        session.commit()
+    except ValueError as exc:
+        session.rollback()
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {
+        "id": entry.id,
+        "list_id": entry.list_id,
+        "progress_current": entry.progress_current,
+        "progress_total": entry.progress_total,
+        "completed_at": entry.completed_at,
+    }
