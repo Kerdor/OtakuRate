@@ -58,3 +58,60 @@ def add_to_list(
 
     session.flush()
     return entry
+
+
+def get_entry(
+    session: Session,
+    *,
+    user_id: int,
+    title_id: int,
+) -> LibraryEntry | None:
+    return session.scalar(
+        select(LibraryEntry).where(
+            LibraryEntry.user_id == user_id,
+            LibraryEntry.title_id == title_id,
+        )
+    )
+
+
+def update_entry(
+    session: Session,
+    *,
+    user_id: int,
+    title_id: int,
+    list_id: int | None = None,
+    progress_current: int | None = None,
+    progress_total: int | None = None,
+    completed_at=None,
+) -> LibraryEntry:
+    entry = get_entry(session, user_id=user_id, title_id=title_id)
+    if entry is None:
+        raise ValueError("Library entry was not found.")
+
+    if list_id is not None:
+        user_list = session.scalar(
+            select(UserList).where(
+                UserList.id == list_id,
+                UserList.user_id == user_id,
+            )
+        )
+        if user_list is None or user_list.media_type != session.get(Title, title_id).media_type:
+            raise ValueError("List was not found for this title.")
+        entry.list_id = list_id
+
+    if progress_current is not None and progress_current < 0:
+        raise ValueError("Progress cannot be negative.")
+    if progress_total is not None and progress_total <= 0:
+        raise ValueError("Progress total must be positive.")
+    if progress_current is not None and progress_total is not None and progress_current > progress_total:
+        raise ValueError("Current progress cannot exceed total progress.")
+
+    if progress_current is not None:
+        entry.progress_current = progress_current
+    if progress_total is not None:
+        entry.progress_total = progress_total
+    if completed_at is not None:
+        entry.completed_at = completed_at
+
+    session.flush()
+    return entry
