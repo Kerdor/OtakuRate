@@ -7,7 +7,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..domain.enums import MediaType
-from ..integrations.base import ExternalCapability, UserListAdapter\nfrom ..models import (
+from ..integrations.base import ExternalCapability, UserListAdapter
+from ..integrations.mapping import map_rating, map_status, normalize_external_id\nfrom ..models import (
     ExternalSource,
     ExternalTitle,
     Title,
@@ -18,27 +19,6 @@ from ..integrations.base import ExternalCapability, UserListAdapter\nfrom ..mode
 )
 from .external_titles import ensure_external_source
 from .library_entries import add_to_list
-
-
-STATUS_MAP = {
-    MediaType.ANIME: {
-        "watching": "watching",
-        "rewatching": "watching",
-        "completed": "completed",
-        "planned": "planned",
-        "on_hold": "paused",
-        "dropped": "dropped",
-    },
-    MediaType.MANGA: {
-        "watching": "reading",
-        "reading": "reading",
-        "rewatching": "reading",
-        "completed": "completed",
-        "planned": "planned",
-        "on_hold": "paused",
-        "dropped": "dropped",
-    },
-}
 
 
 @dataclass(frozen=True)
@@ -149,9 +129,10 @@ def import_shikimori_rates(
 
     for raw_rate in rates:
         rate = adapter._normalize_user_rate(raw_rate)
-        external_id = rate["external_id"]
         item_type = rate["media_type"]
-        if not external_id:
+        try:
+            external_id = normalize_external_id(rate["external_id"])
+        except ValueError:
             report.conflicts.append(
                 ImportConflict("", "", "External rate has no target ID.")
             )
@@ -245,7 +226,7 @@ def import_shikimori_rates(
                 continue
             report.linked_titles += 1
 
-        list_key = STATUS_MAP.get(item_type, {}).get(rate["status"])
+        list_key = map_status(item_type, rate["status"])
         if list_key is None:
             report.conflicts.append(
                 ImportConflict(
@@ -279,8 +260,8 @@ def import_shikimori_rates(
             list_id=user_list.id,
         )
 
-        rating = rate["rating"]
-        if rating not in (None, "", 0):
+        rating = map_rating(rate["rating"])
+        if rating is not None:
             _save_external_rating(
                 session,
                 user_id=user_id,
