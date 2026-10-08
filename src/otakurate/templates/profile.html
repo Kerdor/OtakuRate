@@ -70,6 +70,25 @@
             </div>
         {% endfor %}
     </section>
+    <section class="profile-panel favorite-genres">
+        <h2>Любимые жанры</h2>
+        {% if statistics.favorite_genres %}
+            <div class="favorite-genres-list">
+                {% for genre in statistics.favorite_genres %}
+                    <div class="favorite-genre-row">
+                        <span>{{ genre.name }}</span>
+                        <div class="favorite-genre-track" role="img" aria-label="{{ genre.name }}: средняя оценка {{ genre.average }} из 10">
+                            <span style="width: {{ genre.average * 10 }}%"></span>
+                        </div>
+                        <strong>{{ genre.average }}</strong>
+                        <small>{{ genre.count }} тайтл(ов)</small>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted">Недостаточно данных: оцени тайтлы с указанными жанрами.</p>
+        {% endif %}
+    </section>
     <section class="profile-panel">
         <h2>Любимые тайтлы</h2>
         <p class="muted">Выбери до 10 тайтлов по их ID. Список поиска появится в следующем UI-этапе.</p>
