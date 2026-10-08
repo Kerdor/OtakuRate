@@ -57,6 +57,43 @@ class ShikimoriAdapter:
 
         return results[:limit]
 
+    def fetch_user_rates(
+        self,
+        *,
+        external_user_id: str,
+        media_type: MediaType | None = None,
+        limit: int = 5000,
+    ) -> list[dict]:
+        user_id = external_user_id.strip()
+        if not user_id:
+            return []
+        types = [media_type] if media_type is not None else [MediaType.ANIME, MediaType.MANGA]
+        results: list[dict] = []
+        for item_type in types:
+            endpoint = "anime_rates" if item_type == MediaType.ANIME else "manga_rates"
+            params = urlencode({"limit": min(limit, 5000)})
+            request = Request(
+                f"{self.base_url}/api/users/{user_id}/{endpoint}?{params}",
+                headers={"User-Agent": "OtakuRate/0.1"},
+            )
+            with urlopen(request, timeout=self.timeout) as response:
+                payload = json.load(response)
+            for item in payload:
+                item["_media_type"] = item_type.value
+            results.extend(payload)
+        return results[:limit]
+
+    def _normalize_user_rate(self, item: dict) -> dict:
+        target = item.get("anime") or item.get("manga") or {}
+        target_id = item.get("target_id") or target.get("id")
+        return {
+            "external_id": str(target_id) if target_id is not None else "",
+            "media_type": MediaType.ANIME if item.get("_media_type") == MediaType.ANIME.value else MediaType.MANGA,
+            "status": item.get("status"),
+            "rating": item.get("score"),
+            "target": target,
+        }
+
     def _normalize_item(
         self,
         item: dict,
