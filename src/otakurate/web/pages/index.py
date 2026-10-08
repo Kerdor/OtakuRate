@@ -8,6 +8,7 @@ from sqlalchemy import select
 
 from ...database import SessionLocal
 from ...models import LibraryEntry, Title, UserRating
+from ...services.dev_user import get_dev_user
 from ...rating import ANIME_CRITERIA, CRITERION_INFO, MANGA_CRITERIA
 
 templates = Jinja2Templates(directory="src/otakurate/templates")
@@ -63,6 +64,8 @@ async def title_card(request: Request, title_id: int):
     user_id_raw = request.query_params.get("user_id")
     user_id = int(user_id_raw) if user_id_raw and user_id_raw.isdigit() else None
     with SessionLocal() as session:
+        if user_id is None:
+            user_id = get_dev_user(session).id
         title = session.get(Title, title_id)
         if title is None:
             raise HTTPException(status_code=404, detail="Title not found.")
