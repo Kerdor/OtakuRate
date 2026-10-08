@@ -58,7 +58,7 @@ async def rate(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="rating.html",
-        context={"rating_data": json.dumps(rating_data, ensure_ascii=False), "title_id": request.query_params.get("title_id"), "user_id": request.query_params.get("user_id")},
+        context={"rating_data": json.dumps(rating_data, ensure_ascii=False), "title_id": request.query_params.get("title_id"), "user_id": user_id},
     )
 
 @router.get("/title/{title_id}", response_class=HTMLResponse)
