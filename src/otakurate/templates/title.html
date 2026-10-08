@@ -52,12 +52,12 @@
                         <p class="eyebrow">МОЯ ОЦЕНКА</p>
                         <strong class="own-rating-score">{{ rating.overall_rating }}/10</strong>
                         <p class="muted">Оценка сохранена по версии профиля {{ rating.rating_profile_version }}.</p>
-                        <a class="button-link" href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}">Изменить оценку</a>
+                        <a class="button-link" href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}&title_id={{ title.id }}&user_id={{ user_id }}">Изменить оценку</a>
                     </section>
                 {% else %}
-                    <a class="button-link" href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}">Оценить</a>
+                    <a class="button-link" href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}&title_id={{ title.id }}{% if user_id %}&user_id={{ user_id }}{% endif %}">Оценить</a>
                 {% endif %}
-            </div>
+
                 {% if user_id %}
                     <section class="library-add">
                         <h2>Моя библиотека</h2>
