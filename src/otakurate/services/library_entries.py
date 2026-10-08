@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..domain.enums import MediaType
-from ..models import LibraryEntry, UserList
+from ..models import LibraryEntry, Title, UserList
 
 
 def get_user_lists(session: Session, *, user_id: int, media_type: MediaType) -> list[UserList]:
@@ -33,6 +33,12 @@ def add_to_list(
     )
     if user_list is None:
         raise ValueError("List was not found.")
+
+    title = session.get(Title, title_id)
+    if title is None:
+        raise ValueError("Title was not found.")
+    if title.media_type != user_list.media_type:
+        raise ValueError("List media type does not match the title.")
 
     entry = session.scalar(
         select(LibraryEntry).where(
