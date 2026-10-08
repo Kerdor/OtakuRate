@@ -355,6 +355,31 @@ def test_library_search_by_title():
         )] == [titles[2].id]
 
 
+def test_title_search():
+    from otakurate.database import SessionLocal
+    from otakurate.domain.enums import MediaType
+    from otakurate.models import Title
+    from otakurate.services.title_search import search_titles
+
+    with SessionLocal() as session:
+        titles = [
+            Title(title="Attack on Titan", media_type=MediaType.ANIME),
+            Title(title="Vinland Saga", media_type=MediaType.ANIME),
+            Title(title="One Piece", media_type=MediaType.MANGA),
+        ]
+        session.add_all(titles)
+        session.commit()
+
+        assert [title.title for title in search_titles(session, query="attack")] == ["Attack on Titan"]
+        assert [title.title for title in search_titles(session, query="SAGA")] == ["Vinland Saga"]
+        assert [title.title for title in search_titles(
+            session,
+            query="one",
+            media_type=MediaType.MANGA,
+        )] == ["One Piece"]
+        assert search_titles(session, query="") == []
+
+
 def test_library_sorting():
     from datetime import datetime, timezone
 
