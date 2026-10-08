@@ -62,6 +62,41 @@ def get_profile_summary(session: Session, user_id: int) -> dict:
             for criterion in criteria
         ]
 
+    genre_totals = {}
+    genre_rows = session.execute(
+        select(Title.genres, UserRating.overall_rating)
+        .join(UserRating, UserRating.title_id == Title.id)
+        .where(UserRating.user_id == user_id)
+    )
+    for genres, rating in genre_rows:
+        if not isinstance(genres, list):
+            continue
+        seen_genres = set()
+        for genre in genres:
+            if not isinstance(genre, str):
+                continue
+            genre = genre.strip()
+            normalized = genre.casefold()
+            if not genre or normalized in seen_genres:
+                continue
+            seen_genres.add(normalized)
+            if normalized not in genre_totals:
+                genre_totals[normalized] = {"name": genre, "total": 0, "count": 0}
+            genre_totals[normalized]["total"] += rating
+            genre_totals[normalized]["count"] += 1
+
+    favorite_genres = sorted(
+        (
+            {
+                "name": item["name"],
+                "average": round(item["total"] / item["count"], 2),
+                "count": item["count"],
+            }
+            for item in genre_totals.values()
+        ),
+        key=lambda item: (-item["average"], -item["count"], item["name"].casefold()),
+    )[:10]
+
     anime_count = session.scalar(select(func.count(UserRating.id)).join(Title, Title.id == UserRating.title_id).where(UserRating.user_id == user_id, Title.media_type == MediaType.ANIME)) or 0
     manga_count = session.scalar(select(func.count(UserRating.id)).join(Title, Title.id == UserRating.title_id).where(UserRating.user_id == user_id, Title.media_type == MediaType.MANGA)) or 0
     return {
@@ -70,6 +105,7 @@ def get_profile_summary(session: Session, user_id: int) -> dict:
         "average_rating": round(float(average), 2) if average is not None else None,
         "rating_distribution": rating_distribution,
         "criteria_averages": criteria_averages,
+        "favorite_genres": favorite_genres,
         "anime_rating_count": anime_count,
         "manga_rating_count": manga_count,
     }
