@@ -6,3 +6,4 @@ pydantic-settings
 jinja2
 python-dotenv
 pytest
+itsdangerous>=2.2
