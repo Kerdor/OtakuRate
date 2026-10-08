@@ -23,3 +23,13 @@ h1 { margin: 0 0 8px; font-size: clamp(28px, 5vw, 42px); }
 .rating-actions { display: flex; align-items: center; gap: 14px; margin-top: 20px; }
 button { border: 0; border-radius: 10px; padding: 11px 16px; background: #eee; color: #111; cursor: pointer; font: inherit; }
 @media (max-width: 650px) { .rating-header { flex-direction: column; } .overall-card { width: 100%; } .criterion-card { padding: 16px; } }
+.site-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 70px; }
+.site-brand { color: #eee; text-decoration: none; font-weight: 700; font-size: 20px; }
+.site-nav { display: flex; gap: 18px; }
+.site-nav a { color: #aaa; text-decoration: none; }
+.site-nav a:hover { color: #fff; }
+.hero { max-width: 700px; padding: 20px 0 80px; }
+.hero h1 { font-size: clamp(36px, 7vw, 64px); line-height: 1.05; margin-bottom: 18px; }
+.hero .muted { font-size: 18px; line-height: 1.6; }
+.hero-actions { margin-top: 28px; }
+.button-link { display: inline-block; padding: 11px 16px; border-radius: 10px; background: #eee; color: #111; text-decoration: none; }
