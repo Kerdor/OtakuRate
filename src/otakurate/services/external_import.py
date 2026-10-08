@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -54,6 +55,15 @@ class ImportReport:
     created_titles: int = 0
     linked_titles: int = 0
     conflicts: list[ImportConflict] = field(default_factory=list)
+
+
+def _parse_date(value: str | None) -> date | None:
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        return None
 
 
 def _normalize_name(value: str) -> str:
@@ -191,7 +201,9 @@ def import_shikimori_rates(
                 ],
                 description=target.get("description"),
                 cover_url=(target.get("image") or {}).get("original"),
-                release_date=target.get("aired_on") or target.get("released_on"),
+                release_date=_parse_date(
+                    target.get("aired_on") or target.get("released_on")
+                ),
                 extra_metadata={
                     key: target.get(key)
                     for key in (
