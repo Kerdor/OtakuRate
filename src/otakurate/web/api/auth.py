@@ -2,16 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from ...database import SessionLocal
 from ...services.auth import AuthError, authenticate_user, register_user
-from .dependencies import get_current_user
+from .dependencies import get_current_user, get_session
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
-
-def get_session():
-    with SessionLocal() as session:
-        yield session
 
 
 class CredentialsPayload(BaseModel):
