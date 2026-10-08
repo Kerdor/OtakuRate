@@ -10,6 +10,7 @@ from ...domain.enums import MediaType
 from ...integrations import ExternalSearchResult, ShikimoriAdapter
 from ...models import RatingProfile
 from ...services.dev_user import get_dev_user
+from ...services.external_import import import_shikimori_rates
 from ...services.external_titles import ensure_external_source, link_external_title
 from ...services.library_entries import add_to_list, get_entry, get_user_lists, update_entry
 from ...services.title_search import search_titles
@@ -211,6 +212,51 @@ class ShikimoriLinkPayload(BaseModel):
     cover_url: str | None = None
     release_date: str | None = None
     metadata: dict = {}
+
+
+class ShikimoriImportPayload(BaseModel):
+    user_id: int | None = None
+    external_user_id: str
+    media_type: MediaType | None = None
+
+
+@title_search_router.post("/external/shikimori/import", response_model=dict)
+def import_shikimori_endpoint(
+    payload: ShikimoriImportPayload,
+    session: Session = Depends(get_session),
+):
+    if payload.user_id is None:
+        payload.user_id = get_dev_user(session).id
+    try:
+        report = import_shikimori_rates(
+            session,
+            user_id=payload.user_id,
+            external_user_id=payload.external_user_id,
+            adapter=ShikimoriAdapter(),
+            media_type=payload.media_type,
+        )
+        session.commit()
+    except Exception as exc:
+        session.rollback()
+        raise HTTPException(
+            status_code=502,
+            detail="Shikimori import failed.",
+        ) from exc
+
+    return {
+        "imported": report.imported,
+        "created_titles": report.created_titles,
+        "linked_titles": report.linked_titles,
+        "conflicts": [
+            {
+                "external_id": conflict.external_id,
+                "title": conflict.title,
+                "reason": conflict.reason,
+                "candidate_title_ids": conflict.candidate_title_ids,
+            }
+            for conflict in report.conflicts
+        ],
+    }
 
 
 @title_search_router.post("/titles/{title_id}/external/shikimori", response_model=dict)
