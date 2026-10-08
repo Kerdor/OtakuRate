@@ -10,7 +10,7 @@ const titleId = params.get('title_id');
 document.querySelector('#title').textContent = data.title;
 document.querySelector('#media-type').textContent = data.media_type === 'anime' ? 'АНИМЕ' : 'МАНГА / МАНХВА';
 
-const values = Object.fromEntries(Object.keys(data.criteria).map((key) => [key, 5]));
+const values = Object.fromEntries(Object.entries(data.criteria).map(([key, criterion]) => [key, criterion.value ?? 5]));
 
 function calculateOverall() {
     let total = 0;
@@ -34,7 +34,7 @@ function render() {
                 <strong class="criterion-value" id="value-${key}">5</strong>
             </div>
             <input id="criterion-${key}" type="checkbox" checked hidden>
-            <input class="rating-slider" data-key="${key}" type="range" min="1" max="10" step="1" value="5" aria-label="${criterion.name}">
+            <input class="rating-slider" data-key="${key}" type="range" min="1" max="10" step="1" value="${criterion.value ?? 5}" aria-label="${criterion.name}">
             <div class="slider-scale"><span>1</span><span>10</span></div>
             <p class="score-description" id="score-${key}">${criterion.scores[4]}</p>
             <div class="criterion-meta">Вес: ${criterion.weight.toFixed(1)} · Влияние: <span id="impact-${key}">0.0</span></div>
