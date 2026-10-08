@@ -33,3 +33,13 @@ button { border: 0; border-radius: 10px; padding: 11px 16px; background: #eee; c
 .hero .muted { font-size: 18px; line-height: 1.6; }
 .hero-actions { margin-top: 28px; }
 .button-link { display: inline-block; padding: 11px 16px; border-radius: 10px; background: #eee; color: #111; text-decoration: none; }
+
+.title-search { margin: 0 0 10px; }
+.title-search label { display: block; margin-bottom: 10px; font-weight: 600; }
+.search-row { display: flex; gap: 10px; }
+.search-row input { flex: 1; min-width: 0; padding: 11px 13px; border: 1px solid #333; border-radius: 10px; background: #181818; color: #eee; font: inherit; }
+.search-results { display: grid; gap: 8px; margin-top: 12px; }
+.search-result { display: flex; justify-content: space-between; gap: 16px; padding: 12px 14px; border: 1px solid #2d2d2d; border-radius: 10px; color: #eee; text-decoration: none; background: #181818; }
+.search-result:hover { border-color: #555; }
+.search-result span { color: #888; }
+@media (max-width: 650px) { .search-row { flex-direction: column; } }
