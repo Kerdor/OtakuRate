@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title.title }} — OtakuRate</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <main class="page">
+        <header class="site-header">
+            <a class="site-brand" href="/">OtakuRate</a>
+            <nav class="site-nav" aria-label="Основная навигация">
+                <a href="/">Главная</a>
+                <a href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}">Оценить</a>
+            </nav>
+        </header>
+
+        <article class="title-card">
+            <div class="title-card-cover">
+                {% if title.cover_url %}
+                    <img src="{{ title.cover_url }}" alt="Обложка {{ title.title }}">
+                {% endif %}
+            </div>
+            <div class="title-card-content">
+                <p class="eyebrow">{{ "АНИМЕ" if title.media_type.value == "anime" else "МАНГА" }}</p>
+                <h1>{{ title.title }}</h1>
+
+                {% if title.alternative_titles %}
+                    <p class="muted">{{ title.alternative_titles|join(", ") }}</p>
+                {% endif %}
+
+                {% if title.description %}
+                    <p>{{ title.description }}</p>
+                {% endif %}
+
+                <dl class="title-meta">
+                    {% if title.release_date %}
+                        <div><dt>Дата выхода</dt><dd>{{ title.release_date }}</dd></div>
+                    {% endif %}
+                    {% if title.release_status %}
+                        <div><dt>Статус</dt><dd>{{ title.release_status.value }}</dd></div>
+                    {% endif %}
+                </dl>
+
+                {% if title.genres %}
+                    <p><strong>Жанры:</strong> {{ title.genres|join(", ") }}</p>
+                {% endif %}
+
+                <a class="button-link" href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}">Оценить</a>
+            </div>
+        </article>
+    </main>
+</body>
+</html>
