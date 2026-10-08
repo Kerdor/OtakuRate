@@ -8,6 +8,7 @@ from ...domain.enums import MediaType
 from ...models import RatingProfile
 from ...services.title_search import search_titles
 from ...services.titles import create_title
+from ...services.library_entries import add_to_list, get_user_lists
 from ...services.user_ratings import save_user_rating
 
 router = APIRouter(prefix="/ratings", tags=["ratings"])
@@ -94,6 +95,44 @@ def create_title_endpoint(
         "title": title.title,
         "media_type": title.media_type,
     }
+
+
+
+@title_search_router.get("/lists", response_model=list[dict])
+def get_lists_endpoint(
+    user_id: int,
+    media_type: MediaType,
+    session: Session = Depends(get_session),
+):
+    return [
+        {"id": item.id, "name": item.name, "is_system": item.is_system}
+        for item in get_user_lists(session, user_id=user_id, media_type=media_type)
+    ]
+
+
+class LibraryEntryPayload(BaseModel):
+    user_id: int
+    title_id: int
+    list_id: int
+
+
+@title_search_router.post("/library", response_model=dict, status_code=201)
+def add_to_list_endpoint(
+    payload: LibraryEntryPayload,
+    session: Session = Depends(get_session),
+):
+    try:
+        entry = add_to_list(
+            session,
+            user_id=payload.user_id,
+            title_id=payload.title_id,
+            list_id=payload.list_id,
+        )
+        session.commit()
+    except ValueError as exc:
+        session.rollback()
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"id": entry.id, "title_id": entry.title_id, "list_id": entry.list_id}
 
 
 @title_search_router.get("/titles/search", response_model=list[dict])
