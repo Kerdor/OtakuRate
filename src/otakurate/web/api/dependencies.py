@@ -1,12 +1,18 @@
-from fastapi import HTTPException, Request
+from fastapi import Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from ...config import get_settings
+from ...database import SessionLocal
 from ...models import User
 from ...services.dev_user import get_dev_user
 
 
-def get_current_user(request: Request, session: Session) -> User:
+def get_session():
+    with SessionLocal() as session:
+        yield session
+
+
+def get_current_user(request: Request, session: Session = Depends(get_session)) -> User:
     user_id = request.session.get("user_id")
     if user_id is not None:
         user = session.get(User, int(user_id))
