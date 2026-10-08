@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Профиль — OtakuRate</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<main class="page">
+    <header class="site-header">
+        <a class="site-brand" href="/">OtakuRate</a>
+        <nav class="site-nav" aria-label="Основная навигация">
+            <a href="/">Главная</a><a href="/profile">Профиль</a><a href="/auth/logout" id="logout-link">Выход</a>
+        </nav>
+    </header>
+    <section class="hero profile-hero">
+        <p class="eyebrow">МОЙ АККАУНТ</p>
+        <h1>{{ settings.get("display_name") or user.username }}</h1>
+        <p class="muted">@{{ user.username }} · Зарегистрирован: {{ user.created_at.strftime("%d.%m.%Y") if user.created_at else "—" }}</p>
+    </section>
+    <section class="profile-stats">
+        <article><span>Оценок</span><strong>{{ statistics.rating_count }}</strong></article>
+        <article><span>В библиотеке</span><strong>{{ statistics.library_count }}</strong></article>
+        <article><span>Средняя оценка</span><strong>{{ statistics.average_rating if statistics.average_rating is not none else "—" }}</strong></article>
+        <article><span>Аниме / манга</span><strong>{{ statistics.anime_rating_count }} / {{ statistics.manga_rating_count }}</strong></article>
+    </section>
+    <section class="profile-panel">
+        <h2>Любимые тайтлы</h2>
+        <p class="muted">Выбери до 10 тайтлов по их ID. Список поиска появится в следующем UI-этапе.</p>
+        {% if favorites %}<ul>{% for title in favorites %}<li><a href="/title/{{ title.id }}">{{ title.title }}</a> — {{ "аниме" if title.media_type.value == "anime" else "манга" }}</li>{% endfor %}{% else %}<p class="muted">Пока не выбраны.</p>{% endif %}
+        <form id="favorites-form">
+            <label for="favorite-ids">ID тайтлов через запятую</label>
+            <input id="favorite-ids" placeholder="12, 25, 31">
+            <button type="submit">Сохранить любимые</button>
+            <p id="favorites-message" class="muted" aria-live="polite"></p>
+        </form>
+    </section>
+    <section class="profile-panel">
+        <h2>Настройки профиля и видимости</h2>
+        <form id="profile-settings-form">
+            <label>Отображаемое имя<input id="display-name" maxlength="64" value="{{ settings.get('display_name', user.username) }}"></label>
+            <label>Профиль<select id="profile-visibility">{% for value in ['private','friends','public'] %}<option value="{{ value }}" {% if visibility.get('profile','private') == value %}selected{% endif %}>{{ {'private':'Приватный','friends':'Только друзья','public':'Публичный'}[value] }}</option>{% endfor %}</select></label>
+            <label>Библиотека<select id="library-visibility">{% for value in ['private','friends','public'] %}<option value="{{ value }}" {% if visibility.get('library','private') == value %}selected{% endif %}>{{ {'private':'Приватная','friends':'Только друзья','public':'Публичная'}[value] }}</option>{% endfor %}</select></label>
+            <label>Оценки<select id="ratings-visibility">{% for value in ['private','friends','public'] %}<option value="{{ value }}" {% if visibility.get('ratings','private') == value %}selected{% endif %}>{{ {'private':'Приватные','friends':'Только друзья','public':'Публичные'}[value] }}</option>{% endfor %}</select></label>
+            <button type="submit">Сохранить настройки</button>
+            <p id="settings-message" class="muted" aria-live="polite"></p>
+        </form>
+    </section>
+    <section class="profile-panel">
+        <h2>Настройки рейтинга</h2>
+        <p class="muted">Изменение весов создаёт новую версию профиля. Уже выставленные оценки не меняются автоматически.</p>
+        <label>Тип <select id="rating-media"><option value="anime">Аниме</option><option value="manga">Манга</option></select></label>
+        <div id="rating-criteria"></div>
+        <button id="save-rating-settings" type="button">Сохранить новый профиль оценки</button>
+        <p id="rating-message" class="muted" aria-live="polite"></p>
+    </section>
+</main>
+<script>window.PROFILE_RATING_SETTINGS = {{ rating_settings_json|safe }};</script>
+<script src="/static/profile.js"></script>
+</body>
+</html>
