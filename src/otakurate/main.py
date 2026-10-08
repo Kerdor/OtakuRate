@@ -23,4 +23,5 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="src/otakurate/static"), name="static")
 app.include_router(pages_router)
 app.include_router(api_router)
+app.include_router(auth_router)
 app.include_router(title_search_router)
