@@ -63,7 +63,7 @@
                         <h2>Критерии</h2>
                         <dl class="criteria-values">
                             {% for key, value in rating.criteria_values.items() %}
-                                <div><dt>{{ key }}</dt><dd>{{ value }}/10</dd></div>
+                                <div><dt>{{ criterion_names.get(key, key) }}</dt><dd>{{ value }}/10</dd></div>
                             {% endfor %}
                         </dl>
                     </section>
