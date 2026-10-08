@@ -7,7 +7,12 @@ class FakeAdapter:
     key = "fake"
     name = "Fake"
 
-    capabilities = frozenset({ExternalCapability.SEARCH_TITLES})\n\n    def supports(self, capability):\n        return capability in self.capabilities\n\n    def __init__(self):
+    capabilities = frozenset({ExternalCapability.SEARCH_TITLES})
+
+    def supports(self, capability):
+        return capability in self.capabilities
+
+    def __init__(self):
         self.calls = []
 
     def search_titles(self, *, query, media_type=None, limit=20):
