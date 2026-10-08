@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from ...database import SessionLocal
 from ...domain.enums import MediaType
-from ...integrations import ExternalSearchResult, ShikimoriAdapter
+from ...integrations import ExternalSearchResult, default_registry
 from ...models import RatingProfile
 from ...services.dev_user import get_dev_user
 from ...services.external_import import import_shikimori_rates
@@ -175,7 +175,7 @@ def search_shikimori_endpoint(
     limit: int = 20,
 ):
     try:
-        results = ShikimoriAdapter().search_titles(
+        results = default_registry.create("shikimori").search_titles(
             query=query,
             media_type=media_type,
             limit=limit,
@@ -232,7 +232,7 @@ def import_shikimori_endpoint(
             session,
             user_id=payload.user_id,
             external_user_id=payload.external_user_id,
-            adapter=ShikimoriAdapter(),
+            adapter=default_registry.create("shikimori"),
             media_type=payload.media_type,
         )
         session.commit()
