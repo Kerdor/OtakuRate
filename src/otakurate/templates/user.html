@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Профиль пользователя — OtakuRate</title><link rel="stylesheet" href="/static/style.css"></head>
+<body><main class="page"><header class="site-header"><a class="site-brand" href="/">OtakuRate</a><nav class="site-nav"><a href="/">Главная</a><a href="/profile">Профиль</a><a href="/friends">Друзья</a></nav></header>
+{% if target and target.is_active %}<section class="hero profile-hero"><p class="eyebrow">ПОЛЬЗОВАТЕЛЬ OTakuRATE</p><h1>@{{ target.username }}</h1><p class="muted">Отображаемое имя: {{ (target.settings or {}).get("display_name") or target.username }}</p><div class="favorite-search"><button id="send-request" data-user-id="{{ target.id }}" {% if target.id == viewer.id %}disabled{% endif %}>Добавить в друзья</button><button id="load-comparison" data-user-id="{{ target.id }}" {% if target.id == viewer.id %}disabled{% endif %}>Сравнить</button></div></section>
+<section class="profile-panel"><h2>Общая библиотека и оценки</h2><div id="comparison-results" class="search-results"></div></section><p id="social-message" class="muted" aria-live="polite"></p>
+{% else %}<section class="hero"><h1>Пользователь не найден</h1></section>{% endif %}</main><script src="/static/user.js"></script></body></html>
