@@ -8,7 +8,8 @@ from sqlalchemy.orm import Session
 
 from ..domain.enums import MediaType
 from ..integrations.base import ExternalCapability, UserListAdapter
-from ..integrations.mapping import map_rating, map_status, normalize_external_id\nfrom ..models import (
+from ..integrations.mapping import map_rating, map_status, normalize_external_id
+from ..models import (
     ExternalSource,
     ExternalTitle,
     Title,
