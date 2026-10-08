@@ -43,6 +43,26 @@
             <p class="muted">Пока нет оценок для статистики.</p>
         {% endif %}
     </section>
+    <section class="profile-panel rating-timeline">
+        <h2>Динамика оценок</h2>
+        {% if statistics.rating_timeline %}
+            <p class="muted">Средняя оценка среди тайтлов, впервые оценённых в каждом месяце.</p>
+            <div class="rating-timeline-list">
+                {% for item in statistics.rating_timeline %}
+                    <div class="rating-timeline-row">
+                        <span class="rating-timeline-month">{{ item.label }}</span>
+                        <div class="rating-timeline-track" role="img" aria-label="{{ item.label }}: средняя оценка {{ item.average }} из 10">
+                            <span style="width: {{ item.percentage }}%"></span>
+                        </div>
+                        <strong>{{ item.average }}</strong>
+                        <small>{{ item.count }} оцен.</small>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted">Пока нет данных для динамики оценок.</p>
+        {% endif %}
+    </section>
     <section class="profile-panel criteria-analytics">
         <h2>Средние оценки по критериям</h2>
         {% for media_type, label in [('anime', 'Аниме'), ('manga', 'Манга')] %}
