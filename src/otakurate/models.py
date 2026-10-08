@@ -298,6 +298,27 @@ class LibraryEntryTag(Base):
     )
 
 
+class UserExternalRating(Base):
+    __tablename__ = "user_external_ratings"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "external_title_id",
+            name="uq_user_external_ratings_user_external_title",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    external_title_id: Mapped[int] = mapped_column(
+        ForeignKey("external_titles.id"), nullable=False
+    )
+    rating: Mapped[float] = mapped_column(nullable=False)
+    imported_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+
 class UserRating(Base):
     __tablename__ = "user_ratings"
     __table_args__ = (
