@@ -6,12 +6,19 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from ..domain.enums import MediaType
-from .base import ExternalSearchResult
+from .base import ExternalCapability, ExternalSearchResult
 
 
 class ShikimoriAdapter:
     key = "shikimori"
     name = "Shikimori"
+    capabilities = frozenset({
+        ExternalCapability.SEARCH_TITLES,
+        ExternalCapability.GET_USER_LIST,
+    })
+
+    def supports(self, capability: ExternalCapability) -> bool:
+        return capability in self.capabilities
 
     def __init__(
         self,
@@ -57,7 +64,7 @@ class ShikimoriAdapter:
 
         return results[:limit]
 
-    def fetch_user_rates(
+    def get_user_list(
         self,
         *,
         external_user_id: str,
@@ -82,6 +89,8 @@ class ShikimoriAdapter:
                 item["_media_type"] = item_type.value
             results.extend(payload)
         return results[:limit]
+
+    fetch_user_rates = get_user_list
 
     def _normalize_user_rate(self, item: dict) -> dict:
         target = item.get("anime") or item.get("manga") or {}
