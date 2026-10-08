@@ -347,8 +347,8 @@ def test_library_sorting():
 
         assert [e.created_at for e in filter_library(session, user_id=user.id)] == [
             entries[2].created_at,
-            entries[0].created_at,
             entries[1].created_at,
+            entries[0].created_at,
         ]
         assert [e.created_at for e in filter_library(session, user_id=user.id, sort=LibrarySort.ADDED_OLDEST)] == [
             entries[0].created_at,
