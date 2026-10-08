@@ -126,3 +126,11 @@ def test_library_entry_has_optional_completion_timestamp():
 
     assert columns.completed_at.nullable is True
     assert columns.completed_at.type.__class__.__name__ == "DateTime"
+
+
+
+def test_library_entry_has_optional_notes():
+    columns = LibraryEntry.__table__.c
+
+    assert columns.notes.nullable is True
+    assert columns.notes.type.__class__.__name__ == "Text"
