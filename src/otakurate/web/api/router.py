@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from ...database import SessionLocal
 from ...domain.enums import MediaType
 from ...models import RatingProfile
+from ...services.title_search import search_titles
 from ...services.user_ratings import save_user_rating
 
 router = APIRouter(prefix="/ratings", tags=["ratings"])
@@ -64,3 +65,25 @@ def upsert_rating(payload: RatingPayload, session: Session = Depends(get_session
         "rating_profile_version": rating.rating_profile_version,
     }
 
+
+
+@router.get("/titles/search", response_model=list[dict])
+def search_title_endpoint(
+    query: str,
+    media_type: MediaType | None = None,
+    limit: int = 20,
+    session: Session = Depends(get_session),
+):
+    return [
+        {
+            "id": title.id,
+            "title": title.title,
+            "media_type": title.media_type,
+        }
+        for title in search_titles(
+            session,
+            query=query,
+            media_type=media_type,
+            limit=limit,
+        )
+    ]
