@@ -76,5 +76,5 @@ async def title_card(request: Request, title_id: int):
         return templates.TemplateResponse(
             request=request,
             name="title.html",
-            context={"title": title, "rating": rating, "entry": entry, "user_id": user_id},
+            context={"title": title, "rating": rating, "entry": entry, "user_id": user_id, "criterion_names": {criterion.value: CRITERION_INFO[criterion].name for criterion in (ANIME_CRITERIA if title.media_type.value == "anime" else MANGA_CRITERIA)}},
         )
