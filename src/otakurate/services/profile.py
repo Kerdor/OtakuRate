@@ -11,12 +11,28 @@ def get_profile_summary(session: Session, user_id: int) -> dict:
     rating_count = session.scalar(select(func.count(UserRating.id)).where(UserRating.user_id == user_id)) or 0
     library_count = session.scalar(select(func.count(LibraryEntry.id)).where(LibraryEntry.user_id == user_id)) or 0
     average = session.scalar(select(func.avg(UserRating.overall_rating)).where(UserRating.user_id == user_id))
+    rating_rows = session.execute(
+        select(UserRating.overall_rating, func.count(UserRating.id))
+        .where(UserRating.user_id == user_id)
+        .group_by(UserRating.overall_rating)
+    )
+    rating_counts = {rating: count for rating, count in rating_rows}
+    max_rating_count = max(rating_counts.values(), default=0)
+    rating_distribution = [
+        {
+            "rating": rating,
+            "count": rating_counts.get(rating, 0),
+            "percentage": round(rating_counts.get(rating, 0) / max_rating_count * 100) if max_rating_count else 0,
+        }
+        for rating in range(1, 11)
+    ]
     anime_count = session.scalar(select(func.count(UserRating.id)).join(Title, Title.id == UserRating.title_id).where(UserRating.user_id == user_id, Title.media_type == MediaType.ANIME)) or 0
     manga_count = session.scalar(select(func.count(UserRating.id)).join(Title, Title.id == UserRating.title_id).where(UserRating.user_id == user_id, Title.media_type == MediaType.MANGA)) or 0
     return {
         "rating_count": rating_count,
         "library_count": library_count,
         "average_rating": round(float(average), 2) if average is not None else None,
+        "rating_distribution": rating_distribution,
         "anime_rating_count": anime_count,
         "manga_rating_count": manga_count,
     }
