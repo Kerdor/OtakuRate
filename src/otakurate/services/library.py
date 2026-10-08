@@ -26,6 +26,7 @@ class LibrarySort(StrEnum):
 
 @dataclass(frozen=True)
 class LibraryFilters:
+    search: str | None = None
     media_type: MediaType | None = None
     list_id: int | None = None
     min_rating: int | None = None
@@ -59,6 +60,9 @@ def filter_library(
         )
         .where(LibraryEntry.user_id == user_id)
     )
+
+    if filters.search is not None and filters.search.strip():
+        query = query.where(Title.title.ilike(f"%{filters.search.strip()}%"))
 
     if filters.media_type is not None:
         query = query.where(Title.media_type == filters.media_type)
