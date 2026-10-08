@@ -284,3 +284,75 @@ def test_library_filters_are_optional_and_combinable():
                 completed_to=datetime(2026, 1, 31, 23, 59, tzinfo=timezone.utc),
             ),
         ) == [anime_entry]
+
+
+def test_library_sorting():
+    from datetime import datetime, timezone
+
+    from otakurate.database import SessionLocal
+    from otakurate.domain.enums import MediaType
+    from otakurate.models import Title, User
+    from otakurate.services.library import LibrarySort, filter_library
+
+    with SessionLocal() as session:
+        user = User(username="sort-user")
+        session.add(user)
+        session.flush()
+
+        titles = [
+            Title(title="Zeta", media_type=MediaType.ANIME),
+            Title(title="Alpha", media_type=MediaType.ANIME),
+            Title(title="Beta", media_type=MediaType.ANIME),
+        ]
+        session.add_all(titles)
+        session.flush()
+
+        user_list = UserList(
+            user_id=user.id, media_type=MediaType.ANIME,
+            name="Watching", system_key="watching", is_system=True,
+        )
+        session.add(user_list)
+        session.flush()
+
+        entries = [
+            LibraryEntry(
+                user_id=user.id, title_id=titles[0].id, list_id=user_list.id,
+                progress_current=5,
+                completed_at=datetime(2026, 1, 3, tzinfo=timezone.utc),
+                created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                updated_at=datetime(2026, 1, 5, tzinfo=timezone.utc),
+            ),
+            LibraryEntry(
+                user_id=user.id, title_id=titles[1].id, list_id=user_list.id,
+                progress_current=10,
+                completed_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                created_at=datetime(2026, 1, 2, tzinfo=timezone.utc),
+                updated_at=datetime(2026, 1, 4, tzinfo=timezone.utc),
+            ),
+            LibraryEntry(
+                user_id=user.id, title_id=titles[2].id, list_id=user_list.id,
+                progress_current=None, completed_at=None,
+                created_at=datetime(2026, 1, 3, tzinfo=timezone.utc),
+                updated_at=datetime(2026, 1, 6, tzinfo=timezone.utc),
+            ),
+        ]
+        session.add_all(entries)
+        session.add_all([
+            UserRating(user_id=user.id, title_id=titles[0].id, overall_rating=7,
+                       criteria_values={}, rating_profile_version=1),
+            UserRating(user_id=user.id, title_id=titles[1].id, overall_rating=9,
+                       criteria_values={}, rating_profile_version=1),
+        ])
+        session.commit()
+
+        assert [e.id for e in filter_library(session, user_id=user.id)] == [entries[2].id, entries[1].id, entries[0].id]
+        assert [e.id for e in filter_library(session, user_id=user.id, sort=LibrarySort.ADDED_OLDEST)] == [entries[0].id, entries[1].id, entries[2].id]
+        assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.TITLE_ASC)] == [titles[1].id, titles[2].id, titles[0].id]
+        assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.TITLE_DESC)] == [titles[0].id, titles[2].id, titles[1].id]
+        assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.RATING_HIGH)] == [titles[1].id, titles[0].id, titles[2].id]
+        assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.RATING_LOW)] == [titles[0].id, titles[1].id, titles[2].id]
+        assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.PROGRESS_HIGH)] == [titles[1].id, titles[0].id, titles[2].id]
+        assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.PROGRESS_LOW)] == [titles[0].id, titles[1].id, titles[2].id]
+        assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.COMPLETED_NEWEST)] == [titles[0].id, titles[1].id, titles[2].id]
+        assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.COMPLETED_OLDEST)] == [titles[1].id, titles[0].id, titles[2].id]
+        assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.UPDATED_NEWEST)] == [titles[2].id, titles[0].id, titles[1].id]
