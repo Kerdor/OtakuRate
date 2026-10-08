@@ -63,7 +63,7 @@ async def rate(request: Request):
 async def title_card(request: Request, title_id: int):
     user_id_raw = request.query_params.get("user_id")
     user_id = int(user_id_raw) if user_id_raw and user_id_raw.isdigit() else None
-    with SessionLocal() as session:
+    with SessionLocal.begin() as session:
         if user_id is None:
             user_id = get_dev_user(session).id
         title = session.get(Title, title_id)
