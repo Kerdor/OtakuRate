@@ -98,7 +98,7 @@ def map_rating(
 
 def normalize_title_name(value: str) -> str:
     normalized = unicodedata.normalize("NFKC", value).casefold()
-    return re.sub(r"\\s+", " ", normalized).strip()
+    return re.sub(r"\s+", " ", normalized).strip()
 
 
 @dataclass(frozen=True)
