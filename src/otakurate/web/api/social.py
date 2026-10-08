@@ -16,7 +16,7 @@ def _user_summary(user: User) -> dict:
     return {"id": user.id, "username": user.username, "display_name": (user.settings or {}).get("display_name") or user.username}
 
 
-@router.get("/friends", response_model=list[dict])
+@router.get("/api/friends", response_model=list[dict])
 def friends(session: Session = Depends(get_session), user: User = Depends(get_current_user)):
     return [_user_summary(friend) for friend in get_friends(session, user.id)]
 
