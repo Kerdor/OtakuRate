@@ -23,6 +23,15 @@ async def index(request: Request):
     )
 
 
+@router.get("/titles/new", response_class=HTMLResponse)
+async def new_title(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="new_title.html",
+        context={},
+    )
+
+
 @router.get("/rate", response_class=HTMLResponse)
 async def rate(request: Request):
     media_type = request.query_params.get("type", "anime")
@@ -46,7 +55,7 @@ async def rate(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="rating.html",
-        context={"rating_data": json.dumps(rating_data, ensure_ascii=False)},
+        context={"rating_data": json.dumps(rating_data, ensure_ascii=False), "title_id": request.query_params.get("title_id"), "user_id": request.query_params.get("user_id")},
     )
 
 @router.get("/title/{title_id}", response_class=HTMLResponse)
