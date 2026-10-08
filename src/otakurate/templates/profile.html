@@ -25,6 +25,24 @@
         <article><span>Средняя оценка</span><strong>{{ statistics.average_rating if statistics.average_rating is not none else "—" }}</strong></article>
         <article><span>Аниме / манга</span><strong>{{ statistics.anime_rating_count }} / {{ statistics.manga_rating_count }}</strong></article>
     </section>
+    <section class="profile-panel rating-distribution">
+        <h2>Распределение оценок</h2>
+        {% if statistics.rating_count %}
+            <div class="rating-distribution-list">
+                {% for item in statistics.rating_distribution %}
+                    <div class="rating-distribution-row">
+                        <span class="rating-distribution-label">{{ item.rating }}</span>
+                        <div class="rating-distribution-track" role="img" aria-label="Оценка {{ item.rating }}: {{ item.count }} тайтлов">
+                            <span style="width: {{ item.percentage }}%"></span>
+                        </div>
+                        <span class="rating-distribution-count">{{ item.count }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted">Пока нет оценок для статистики.</p>
+        {% endif %}
+    </section>
     <section class="profile-panel">
         <h2>Любимые тайтлы</h2>
         <p class="muted">Выбери до 10 тайтлов по их ID. Список поиска появится в следующем UI-этапе.</p>
