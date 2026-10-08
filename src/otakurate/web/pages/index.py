@@ -10,6 +10,7 @@ from ...database import SessionLocal
 from ...models import LibraryEntry, Title, UserRating
 from ..api.dependencies import get_current_user
 from ...rating import ANIME_CRITERIA, CRITERION_INFO, MANGA_CRITERIA
+from ...services.profile import get_rating_settings
 
 templates = Jinja2Templates(directory="src/otakurate/templates")
 router = APIRouter()
@@ -36,7 +37,9 @@ async def new_title(request: Request):
 @router.get("/rate", response_class=HTMLResponse)
 async def rate(request: Request):
     with SessionLocal.begin() as session:
-        user_id = get_current_user(request, session).id
+        user = get_current_user(request, session)
+        user_id = user.id
+        rating_settings = get_rating_settings(session, user_id)
     media_type = request.query_params.get("type", "anime")
     if media_type not in {"anime", "manga"}:
         media_type = "anime"
@@ -50,9 +53,10 @@ async def rate(request: Request):
                 "name": CRITERION_INFO[criterion].name,
                 "description": CRITERION_INFO[criterion].description,
                 "scores": CRITERION_INFO[criterion].score_descriptions,
-                "weight": 1.0,
+                "weight": rating_settings[media_type]["criteria"].get(criterion.value, {}).get("weight", 1.0),
             }
             for criterion in criteria
+            if rating_settings[media_type]["criteria"].get(criterion.value, {}).get("enabled", True)
         },
     }
     return templates.TemplateResponse(
