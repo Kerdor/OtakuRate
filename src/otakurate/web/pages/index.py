@@ -1,9 +1,11 @@
 import json
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from ...database import SessionLocal
+from ...models import Title
 from ...rating import ANIME_CRITERIA, CRITERION_INFO, MANGA_CRITERIA
 
 templates = Jinja2Templates(directory="src/otakurate/templates")
@@ -44,3 +46,16 @@ async def rate(request: Request):
         name="rating.html",
         context={"rating_data": json.dumps(rating_data, ensure_ascii=False)},
     )
+
+@router.get("/title/{title_id}", response_class=HTMLResponse)
+async def title_card(request: Request, title_id: int):
+    with SessionLocal() as session:
+        title = session.get(Title, title_id)
+        if title is None:
+            raise HTTPException(status_code=404, detail="Title not found.")
+
+        return templates.TemplateResponse(
+            request=request,
+            name="title.html",
+            context={"title": title},
+        )
