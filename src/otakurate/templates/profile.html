@@ -43,6 +43,33 @@
             <p class="muted">Пока нет оценок для статистики.</p>
         {% endif %}
     </section>
+    <section class="profile-panel criteria-analytics">
+        <h2>Средние оценки по критериям</h2>
+        {% for media_type, label in [('anime', 'Аниме'), ('manga', 'Манга')] %}
+            <div class="criteria-analytics-group">
+                <h3>{{ label }}</h3>
+                {% set criteria = statistics.criteria_averages[media_type] %}
+                {% if criteria|selectattr('count', 'gt', 0)|list %}
+                    <div class="criteria-average-list">
+                        {% for item in criteria %}
+                            {% if item.count %}
+                                <div class="criteria-average-row">
+                                    <span class="criteria-average-name">{{ item.name }}</span>
+                                    <div class="criteria-average-track" role="img" aria-label="{{ item.name }}: {{ item.average }} из 10">
+                                        <span style="width: {{ item.average * 10 }}%"></span>
+                                    </div>
+                                    <strong>{{ item.average }}</strong>
+                                </div>
+                                <p class="criteria-average-count">{{ item.count }} оценок критерия</p>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="muted">Пока нет оценок критериев.</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </section>
     <section class="profile-panel">
         <h2>Любимые тайтлы</h2>
         <p class="muted">Выбери до 10 тайтлов по их ID. Список поиска появится в следующем UI-этапе.</p>
