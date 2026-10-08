@@ -134,3 +134,153 @@ def test_library_entry_has_optional_notes():
 
     assert columns.notes.nullable is True
     assert columns.notes.type.__class__.__name__ == "Text"
+
+
+def test_library_filters_are_optional_and_combinable():
+    from datetime import datetime, timezone
+
+    from otakurate.database import SessionLocal
+    from otakurate.domain.enums import MediaType
+    from otakurate.models import Title, User
+
+    from otakurate.services.library import LibraryFilters, filter_library
+
+    with SessionLocal() as session:
+        user = User(username="filter-user")
+        other_user = User(username="other-user")
+        session.add_all([user, other_user])
+        session.flush()
+
+        anime = Title(title="Anime", media_type=MediaType.ANIME)
+        manga = Title(title="Manga", media_type=MediaType.MANGA)
+        other_title = Title(title="Other", media_type=MediaType.ANIME)
+        session.add_all([anime, manga, other_title])
+        session.flush()
+
+        from otakurate.models import UserList, UserRating, UserTag, LibraryEntry, LibraryEntryTag
+
+        watched = UserList(
+            user_id=user.id,
+            media_type=MediaType.ANIME,
+            name="Watched",
+            system_key="watched",
+            is_system=True,
+        )
+        reading = UserList(
+            user_id=user.id,
+            media_type=MediaType.MANGA,
+            name="Reading",
+            system_key="reading",
+            is_system=True,
+        )
+        other_list = UserList(
+            user_id=other_user.id,
+            media_type=MediaType.ANIME,
+            name="Watched",
+            system_key="watched",
+            is_system=True,
+        )
+        session.add_all([watched, reading, other_list])
+        session.flush()
+
+        anime_entry = LibraryEntry(
+            user_id=user.id,
+            title_id=anime.id,
+            list_id=watched.id,
+            progress_current=5,
+            progress_total=12,
+            completed_at=datetime(2026, 1, 10, tzinfo=timezone.utc),
+            notes="keep",
+            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+        )
+        manga_entry = LibraryEntry(
+            user_id=user.id,
+            title_id=manga.id,
+            list_id=reading.id,
+            created_at=datetime(2026, 2, 1, tzinfo=timezone.utc),
+        )
+        other_entry = LibraryEntry(
+            user_id=other_user.id,
+            title_id=other_title.id,
+            list_id=other_list.id,
+        )
+        session.add_all([anime_entry, manga_entry, other_entry])
+        session.flush()
+
+        tag = UserTag(user_id=user.id, name="favorite")
+        second_tag = UserTag(user_id=user.id, name="rewatch")
+        other_tag = UserTag(user_id=other_user.id, name="favorite")
+        session.add_all([tag, second_tag, other_tag])
+        session.flush()
+
+        session.add_all(
+            [
+                LibraryEntryTag(
+                    library_entry_id=anime_entry.id,
+                    tag_id=tag.id,
+                ),
+                LibraryEntryTag(
+                    library_entry_id=anime_entry.id,
+                    tag_id=second_tag.id,
+                ),
+            ]
+        )
+        session.add_all(
+            [
+                UserRating(
+                    user_id=user.id,
+                    title_id=anime.id,
+                    overall_rating=9,
+                    criteria_values={},
+                    rating_profile_version=1,
+                ),
+                UserRating(
+                    user_id=user.id,
+                    title_id=manga.id,
+                    overall_rating=6,
+                    criteria_values={},
+                    rating_profile_version=1,
+                ),
+            ]
+        )
+        session.commit()
+
+        assert [entry.id for entry in filter_library(session, user_id=user.id)] == [
+            manga_entry.id,
+            anime_entry.id,
+        ]
+        assert filter_library(
+            session,
+            user_id=user.id,
+            filters=LibraryFilters(media_type=MediaType.ANIME),
+        ) == [anime_entry]
+        assert filter_library(
+            session,
+            user_id=user.id,
+            filters=LibraryFilters(min_rating=8, max_rating=10),
+        ) == [anime_entry]
+        assert filter_library(
+            session,
+            user_id=user.id,
+            filters=LibraryFilters(has_progress=True, completed=True, has_notes=True),
+        ) == [anime_entry]
+        assert filter_library(
+            session,
+            user_id=user.id,
+            filters=LibraryFilters(has_progress=False, completed=False, has_notes=False),
+        ) == [manga_entry]
+        assert filter_library(
+            session,
+            user_id=user.id,
+            filters=LibraryFilters(tag_ids=(tag.id, second_tag.id)),
+        ) == [anime_entry]
+        assert filter_library(
+            session,
+            user_id=user.id,
+            filters=LibraryFilters(
+                added_from=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                added_to=datetime(2026, 1, 31, 23, 59, tzinfo=timezone.utc),
+                completed_from=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                completed_to=datetime(2026, 1, 31, 23, 59, tzinfo=timezone.utc),
+            ),
+        ) == [anime_entry]
