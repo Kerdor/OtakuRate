@@ -9,7 +9,6 @@ from ..domain.enums import MediaType
 from ..models import LibraryEntry, LibraryEntryTag, Title, UserRating, UserTag
 
 
-@dataclass(frozen=True)
 class LibrarySort(StrEnum):
     ADDED_NEWEST = "added_newest"
     ADDED_OLDEST = "added_oldest"
