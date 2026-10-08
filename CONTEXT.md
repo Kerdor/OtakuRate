@@ -186,9 +186,7 @@ Shikimori выбран первым внешним каталогом, пото�
 
 ## 12. Что делать дальше
 
-1. Пользователь подтягивает изменения и запускает полный набор pytest.
-2. Если тесты зелёные — отметить 6.2.1–6.2.4 завершёнными в roadmap и зафиксировать проверку здесь.
-3. Следовать следующему разделу roadmap после 6.2.
+Следующий крупный этап после 7.1 — 7.2: подготовить источники под общий capability-based контракт.
 
 
 ## 6.3 — импорт из Shikimori
@@ -203,5 +201,19 @@ Shikimori выбран первым внешним каталогом, пото�
 - Внешняя оценка хранится отдельно в UserExternalRating и не изменяет UserRating.
 - Совпадения по названию не объединяются автоматически: создаются TitleMatchCandidate и возвращается ImportConflict для ручного решения.
 - Добавлен POST /external/shikimori/import.
-- Добавлена миграция 0013_external_ratings.
+- Добавлена миграция 0016 для пользовательских внешних оценок после существующей цепочки 0013–0015.
 - Добавлены unit/integration tests для импорта и адаптера.
+
+## 13. Завершён 7.1 — capability-based Adapter API
+
+Интеграционный слой переведён на общий capability-based контракт.
+
+- `ExternalCapability` содержит стабильный набор операций: `search_titles`, `get_title`, `get_user_list`, `get_rating`, `set_rating`, `get_status`, `set_status`, `get_progress`, `set_progress`.
+- `ExternalSourceAdapter` отвечает только за идентичность источника и список его capabilities.
+- Операционные контракты разделены на отдельные Protocol: `TitleSearchAdapter` и `UserListAdapter`.
+- Источник не обязан реализовывать неподдерживаемые операции.
+- `services/external_search.py` проверяет capability поиска перед вызовом.
+- `services/external_import.py` проверяет capability импорта пользовательского списка.
+- `ShikimoriAdapter` сейчас объявляет только `SEARCH_TITLES` и `GET_USER_LIST`.
+- Для совместимости сохранён `fetch_user_rates` как alias к `get_user_list`.
+- Добавлены тесты capability-контракта и обновлены существующие тестовые адаптеры.
