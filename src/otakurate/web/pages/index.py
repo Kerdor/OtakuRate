@@ -4,8 +4,10 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from sqlalchemy import select
+
 from ...database import SessionLocal
-from ...models import Title
+from ...models import Title, UserRating
 from ...rating import ANIME_CRITERIA, CRITERION_INFO, MANGA_CRITERIA
 
 templates = Jinja2Templates(directory="src/otakurate/templates")
@@ -49,13 +51,24 @@ async def rate(request: Request):
 
 @router.get("/title/{title_id}", response_class=HTMLResponse)
 async def title_card(request: Request, title_id: int):
+    user_id_raw = request.query_params.get("user_id")
+    user_id = int(user_id_raw) if user_id_raw and user_id_raw.isdigit() else None
     with SessionLocal() as session:
         title = session.get(Title, title_id)
         if title is None:
             raise HTTPException(status_code=404, detail="Title not found.")
 
+        rating = None
+        if user_id is not None:
+            rating = session.scalar(
+                select(UserRating).where(
+                    UserRating.user_id == user_id,
+                    UserRating.title_id == title.id,
+                )
+            )
+
         return templates.TemplateResponse(
             request=request,
             name="title.html",
-            context={"title": title},
+            context={"title": title, "rating": rating, "user_id": user_id},
         )
