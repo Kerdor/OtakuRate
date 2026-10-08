@@ -5,7 +5,7 @@ from .base import (
     TitleSearchAdapter,
     UserListAdapter,
 )
-from .shikimori import ShikimoriAdapter
+from .shikimori import ShikimoriAdapter\nfrom .registry import IntegrationRegistry, create_default_registry, default_registry
 
 __all__ = [
     "ExternalCapability",
@@ -13,5 +13,5 @@ __all__ = [
     "ExternalSourceAdapter",
     "TitleSearchAdapter",
     "UserListAdapter",
-    "ShikimoriAdapter",
+    "ShikimoriAdapter",\n    "IntegrationRegistry",\n    "create_default_registry",\n    "default_registry",
 ]
