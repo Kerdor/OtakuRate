@@ -365,26 +365,3 @@ class FriendRequest(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc), nullable=False
     )
-
-
-class FriendRequestStatus(StrEnum):
-    PENDING = "pending"
-    ACCEPTED = "accepted"
-    REJECTED = "rejected"
-
-
-class FriendRequest(Base):
-    __tablename__ = "friend_requests"
-    __table_args__ = (
-        UniqueConstraint("requester_id", "addressee_id", name="uq_friend_requests_pair"),
-        CheckConstraint("requester_id != addressee_id", name="ck_friend_requests_not_self"),
-    )
-    id: Mapped[int] = mapped_column(primary_key=True)
-    requester_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    addressee_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    status: Mapped[FriendRequestStatus] = mapped_column(
-        Enum(FriendRequestStatus, name="friendrequeststatus"),
-        default=FriendRequestStatus.PENDING, nullable=False,
-    )
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
