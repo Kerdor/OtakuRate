@@ -1,11 +1,28 @@
 from dataclasses import dataclass
 from datetime import datetime
+from enum import StrEnum
 
-from sqlalchemy import Select, exists, select
+from sqlalchemy import Select, exists, func, nullslast, select
 from sqlalchemy.orm import Session
 
 from ..domain.enums import MediaType
 from ..models import LibraryEntry, LibraryEntryTag, Title, UserRating, UserTag
+
+
+@dataclass(frozen=True)
+class LibrarySort(StrEnum):
+    ADDED_NEWEST = "added_newest"
+    ADDED_OLDEST = "added_oldest"
+    COMPLETED_NEWEST = "completed_newest"
+    COMPLETED_OLDEST = "completed_oldest"
+    TITLE_ASC = "title_asc"
+    TITLE_DESC = "title_desc"
+    RATING_HIGH = "rating_high"
+    RATING_LOW = "rating_low"
+    PROGRESS_HIGH = "progress_high"
+    PROGRESS_LOW = "progress_low"
+    UPDATED_NEWEST = "updated_newest"
+    RANDOM = "random"
 
 
 @dataclass(frozen=True)
@@ -29,6 +46,7 @@ def filter_library(
     *,
     user_id: int,
     filters: LibraryFilters | None = None,
+    sort: LibrarySort = LibrarySort.ADDED_NEWEST,
 ) -> list[LibraryEntry]:
     filters = filters or LibraryFilters()
 
@@ -41,7 +59,6 @@ def filter_library(
             & (UserRating.title_id == LibraryEntry.title_id),
         )
         .where(LibraryEntry.user_id == user_id)
-        .order_by(LibraryEntry.created_at.desc(), LibraryEntry.id.desc())
     )
 
     if filters.media_type is not None:
@@ -100,5 +117,24 @@ def filter_library(
 
     if filters.completed_to is not None:
         query = query.where(LibraryEntry.completed_at <= filters.completed_to)
+
+    sort_order = {
+        LibrarySort.ADDED_NEWEST: (LibraryEntry.created_at.desc(), LibraryEntry.id.desc()),
+        LibrarySort.ADDED_OLDEST: (LibraryEntry.created_at.asc(), LibraryEntry.id.asc()),
+        LibrarySort.COMPLETED_NEWEST: (nullslast(LibraryEntry.completed_at.desc()), LibraryEntry.id.desc()),
+        LibrarySort.COMPLETED_OLDEST: (nullslast(LibraryEntry.completed_at.asc()), LibraryEntry.id.asc()),
+        LibrarySort.TITLE_ASC: (Title.title.asc(), LibraryEntry.id.asc()),
+        LibrarySort.TITLE_DESC: (Title.title.desc(), LibraryEntry.id.desc()),
+        LibrarySort.RATING_HIGH: (nullslast(UserRating.overall_rating.desc()), LibraryEntry.id.desc()),
+        LibrarySort.RATING_LOW: (nullslast(UserRating.overall_rating.asc()), LibraryEntry.id.asc()),
+        LibrarySort.PROGRESS_HIGH: (nullslast(LibraryEntry.progress_current.desc()), LibraryEntry.id.desc()),
+        LibrarySort.PROGRESS_LOW: (nullslast(LibraryEntry.progress_current.asc()), LibraryEntry.id.asc()),
+        LibrarySort.UPDATED_NEWEST: (LibraryEntry.updated_at.desc(), LibraryEntry.id.desc()),
+    }
+
+    if sort is LibrarySort.RANDOM:
+        query = query.order_by(func.random())
+    else:
+        query = query.order_by(*sort_order[sort])
 
     return list(session.scalars(query))
