@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Добавить тайтл — OtakuRate</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<main class="page">
+    <header class="site-header">
+        <a class="site-brand" href="/">OtakuRate</a>
+        <nav class="site-nav">
+            <a href="/">Главная</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <p class="eyebrow">НОВЫЙ ТАЙТЛ</p>
+        <h1>Добавить тайтл</h1>
+        <form id="new-title-form" class="title-search">
+            <label for="new-title-name">Название</label>
+            <input id="new-title-name" type="text" maxlength="255" required>
+            <fieldset>
+                <legend>Тип</legend>
+                <label><input type="radio" name="media-type" value="anime" checked> Аниме</label>
+                <label><input type="radio" name="media-type" value="manga"> Манга / манхва</label>
+            </fieldset>
+            <button type="submit">Создать</button>
+            <p id="new-title-status" class="muted" aria-live="polite"></p>
+        </form>
+    </section>
+</main>
+<script src="/static/new-title.js"></script>
+</body>
+</html>
