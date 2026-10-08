@@ -328,19 +328,21 @@
 
 ## 7.1. Adapter API
 
-- [ ] 7.1.1. Общий контракт интеграции.
-- [ ] 7.1.2. Сделать операции capability-based, а не обязательными для каждого источника.
-- [ ] 7.1.3. Capability `search_titles()`.
-- [ ] 7.1.4. Capability `get_title()`.
-- [ ] 7.1.5. Capability `get_user_list()`.
-- [ ] 7.1.6. Capability `get_rating()`.
-- [ ] 7.1.7. Capability `set_rating()`.
-- [ ] 7.1.8. Capability `get_status()`.
-- [ ] 7.1.9. Capability `set_status()`.
-- [ ] 7.1.10. Capability `get_progress()`.
-- [ ] 7.1.11. Capability `set_progress()`.
-- [ ] 7.1.12. Чётко сообщать, какие операции конкретный источник поддерживает.
-- [ ] 7.1.13. Не требовать от источника реализацию неподдерживаемых операций.
+- [x] 7.1.1. Общий контракт интеграции.
+- [x] 7.1.2. Сделать операции capability-based, а не обязательными для каждого источника.
+- [x] 7.1.3. Capability `search_titles()`.
+- [x] 7.1.4. Capability `get_title()`.
+- [x] 7.1.5. Capability `get_user_list()`.
+- [x] 7.1.6. Capability `get_rating()`.
+- [x] 7.1.7. Capability `set_rating()`.
+- [x] 7.1.8. Capability `get_status()`.
+- [x] 7.1.9. Capability `set_status()`.
+- [x] 7.1.10. Capability `get_progress()`.
+- [x] 7.1.11. Capability `set_progress()`.
+- [x] 7.1.12. Чётко сообщать, какие операции конкретный источник поддерживает.
+- [x] 7.1.13. Не требовать от источника реализацию неподдерживаемых операций.
+
+> 7.1 реализован через capability-based контракт: общий `ExternalSourceAdapter` описывает идентичность источника и поддерживаемые операции, а отдельные operation protocols описывают конкретные методы. Shikimori сейчас объявляет только `search_titles` и `get_user_list`; неподдерживаемые операции не требуются от адаптера и не объявляются.
 
 ## 7.2. Источники
 
