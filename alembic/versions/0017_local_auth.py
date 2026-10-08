@@ -18,7 +18,10 @@ def upgrade() -> None:
         "users",
         sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.true()),
     )
-    op.alter_column("users", "is_active", server_default=None)
+    # SQLite cannot drop a column default with ALTER COLUMN. Keeping the
+    # server default is safe and preserves compatibility with existing rows.
+    if op.get_bind().dialect.name != "sqlite":
+        op.alter_column("users", "is_active", server_default=None)
 
 
 def downgrade() -> None:
