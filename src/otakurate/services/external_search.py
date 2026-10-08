@@ -1,5 +1,5 @@
 from ..domain.enums import MediaType
-from ..integrations.base import ExternalSearchResult, ExternalSourceAdapter
+from ..integrations.base import (\n    ExternalCapability,\n    ExternalSearchResult,\n    ExternalSourceAdapter,\n    TitleSearchAdapter,\n)
 
 
 def search_external_titles(
@@ -14,7 +14,7 @@ def search_external_titles(
         return []
 
     limit = max(1, min(limit, 50))
-    results = adapter.search_titles(
+    if not adapter.supports(ExternalCapability.SEARCH_TITLES):\n        raise ValueError(f"External source {adapter.key!r} does not support title search.")\n\n    search_adapter: TitleSearchAdapter = adapter\n    results = search_adapter.search_titles(
         query=normalized,
         media_type=media_type,
         limit=limit,
