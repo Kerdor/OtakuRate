@@ -94,3 +94,18 @@ button { border: 0; border-radius: 10px; padding: 11px 16px; background: #eee; c
     .profile-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .rating-distribution-row { gap: 8px; }
 }
+
+
+/* Средние оценки по критериям */
+.criteria-analytics-group { margin-top: 20px; }
+.criteria-analytics-group h3 { margin-bottom: 14px; }
+.criteria-average-list { display: grid; gap: 4px; }
+.criteria-average-row { display: grid; grid-template-columns: minmax(110px, 1fr) minmax(80px, 2fr) 36px; gap: 12px; align-items: center; }
+.criteria-average-name { color: #ddd; }
+.criteria-average-row strong { text-align: right; font-variant-numeric: tabular-nums; }
+.criteria-average-track { height: 10px; overflow: hidden; border-radius: 999px; background: #303030; }
+.criteria-average-track span { display: block; height: 100%; border-radius: inherit; background: #8b7cf6; }
+.criteria-average-count { margin: 2px 0 10px; color: #777; font-size: 12px; }
+@media (max-width: 500px) {
+    .criteria-average-row { grid-template-columns: minmax(90px, 1fr) minmax(48px, 1fr) 30px; gap: 8px; font-size: 13px; }
+}
