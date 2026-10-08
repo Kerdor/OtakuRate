@@ -8,6 +8,8 @@ from .web.api.profile import router as profile_api_router
 from .web.api.router import router as api_router, title_search_router
 from .web.pages.index import router as pages_router
 from .web.pages.profile import router as profile_pages_router
+from .web.api.social import router as social_api_router
+from .web.pages.social import router as social_pages_router
 
 settings = get_settings()
 
@@ -27,5 +29,7 @@ app.include_router(pages_router)
 app.include_router(api_router)
 app.include_router(auth_router)
 app.include_router(profile_api_router)
+app.include_router(social_api_router)
 app.include_router(profile_pages_router)
+app.include_router(social_pages_router)
 app.include_router(title_search_router)
