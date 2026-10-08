@@ -47,7 +47,16 @@
                     <p><strong>Жанры:</strong> {{ title.genres|join(", ") }}</p>
                 {% endif %}
 
-                <a class="button-link" href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}">Оценить</a>
+                {% if rating %}
+                    <section class="own-rating">
+                        <p class="eyebrow">МОЯ ОЦЕНКА</p>
+                        <strong class="own-rating-score">{{ rating.overall_rating }}/10</strong>
+                        <p class="muted">Оценка сохранена по версии профиля {{ rating.rating_profile_version }}.</p>
+                        <a class="button-link" href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}">Изменить оценку</a>
+                    </section>
+                {% else %}
+                    <a class="button-link" href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}">Оценить</a>
+                {% endif %}
             </div>
         </article>
     </main>
