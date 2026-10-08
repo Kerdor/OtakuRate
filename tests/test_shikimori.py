@@ -36,5 +36,6 @@ def test_shikimori_fetch_user_rates():
             media_type=MediaType.ANIME,
         )
 
-    assert rates == payload[:]
+    assert rates[0]["_media_type"] == "anime"
+    assert {k: v for k, v in rates[0].items() if k != "_media_type"} == payload[0]
     mocked.assert_called_once()
