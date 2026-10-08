@@ -18,6 +18,17 @@
         </header>
 
         <section class="hero">
+            <form id="title-search-form" class="title-search">
+                <label for="title-search-input">Поиск тайтлов</label>
+                <div class="search-row">
+                    <input id="title-search-input" type="search" placeholder="Название аниме или манги" autocomplete="off">
+                    <button type="submit">Найти</button>
+                </div>
+                <div id="title-search-results" class="search-results" aria-live="polite"></div>
+            </form>
+        </section>
+
+        <section class="hero">
             <p class="eyebrow">ЛИЧНАЯ СИСТЕМА ОЦЕНОК</p>
             <h1>Оценивай аниме и мангу по-своему.</h1>
             <p class="muted">
@@ -34,5 +45,6 @@
             <p class="muted">Личная библиотека и система субъективных оценок аниме и манги.</p>
         </section>
     </main>
+    <script src="/static/title-search.js"></script>
 </body>
 </html>
