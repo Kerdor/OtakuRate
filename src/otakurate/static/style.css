@@ -65,3 +65,17 @@ button { border: 0; border-radius: 10px; padding: 11px 16px; background: #eee; c
 .criteria-values { display: grid; gap: 8px; }
 .criteria-values div { display: flex; justify-content: space-between; gap: 20px; border-bottom: 1px solid #222; padding: 6px 0; }
 .criteria-values dd { margin: 0; font-weight: 600; }
+
+.profile-hero { padding-bottom: 24px; }
+.profile-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 28px; }
+.profile-stats article, .profile-panel { border: 1px solid #303030; border-radius: 14px; padding: 18px; background: #181818; }
+.profile-stats span { display: block; color: #999; font-size: 13px; }
+.profile-stats strong { display: block; font-size: 28px; margin-top: 8px; }
+.profile-panel { margin: 18px 0; }
+.profile-panel h2 { margin-top: 0; }
+.profile-panel form { display: grid; gap: 12px; margin-top: 18px; max-width: 520px; }
+.profile-panel label { display: grid; gap: 6px; }
+.profile-panel input:not([type=checkbox]), .profile-panel select, .rating-setting-row input[type=number] { padding: 10px; border-radius: 8px; border: 1px solid #333; background: #111; color: #eee; font: inherit; }
+.rating-setting-row { display: grid; grid-template-columns: minmax(120px, 1fr) 100px 130px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid #292929; }
+.rating-setting-row label { margin: 0; }
+@media (max-width: 650px) { .profile-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rating-setting-row { grid-template-columns: 1fr 80px; } .rating-setting-row label:last-child { grid-column: 1 / -1; } .site-header { flex-wrap: wrap; margin-bottom: 36px; } .site-nav { flex-wrap: wrap; } }
