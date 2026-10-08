@@ -190,3 +190,18 @@ Shikimori выбран первым внешним каталогом, пото�
 2. Если тесты зелёные — отметить 6.2.1–6.2.4 завершёнными в roadmap и зафиксировать проверку здесь.
 3. Следовать следующему разделу roadmap после 6.2.
 
+
+## 6.3 — импорт из Shikimori
+
+Реализован импорт пользовательского списка из Shikimori.
+
+- ShikimoriAdapter.fetch_user_rates() получает anime/manga user rates через публичные user-rates endpoints.
+- services/external_import.py сопоставляет записи по (source, external_id).
+- Отсутствующие Title и ExternalTitle создаются автоматически.
+- Статусы Shikimori маппятся в системные списки OtakuRate: watching/rewatching → watching, completed → completed, planned → planned, on_hold → paused, dropped → dropped; для manga watching/reading → reading.
+- Прогресс (episodes, chapters, volumes) при импорте намеренно не записывается в LibraryEntry.
+- Внешняя оценка хранится отдельно в UserExternalRating и не изменяет UserRating.
+- Совпадения по названию не объединяются автоматически: создаются TitleMatchCandidate и возвращается ImportConflict для ручного решения.
+- Добавлен POST /external/shikimori/import.
+- Добавлена миграция 0013_external_ratings.
+- Добавлены unit/integration tests для импорта и адаптера.
