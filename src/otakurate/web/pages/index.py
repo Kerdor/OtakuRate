@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 
 from ...database import SessionLocal
-from ...models import Title, UserRating
+from ...models import LibraryEntry, Title, UserRating
 from ...rating import ANIME_CRITERIA, CRITERION_INFO, MANGA_CRITERIA
 
 templates = Jinja2Templates(directory="src/otakurate/templates")
@@ -71,7 +71,6 @@ async def title_card(request: Request, title_id: int):
         entry = None
         if user_id is not None:
             rating = session.scalar(select(UserRating).where(UserRating.user_id == user_id, UserRating.title_id == title.id))
-            from ...models import LibraryEntry
             entry = session.scalar(select(LibraryEntry).where(LibraryEntry.user_id == user_id, LibraryEntry.title_id == title.id))
 
         return templates.TemplateResponse(
