@@ -1,7 +1,8 @@
 from sqlalchemy import select
 
 from otakurate.database import SessionLocal
-from otakurate.domain.enums import MediaType\nfrom otakurate.integrations.base import ExternalCapability
+from otakurate.domain.enums import MediaType
+from otakurate.integrations.base import ExternalCapability
 from otakurate.models import (
     ExternalTitle,
     LibraryEntry,
