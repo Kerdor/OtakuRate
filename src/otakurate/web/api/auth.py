@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from ...database import SessionLocal
 from ...services.auth import AuthError, authenticate_user, register_user
-from ..dependencies import get_current_user
+from .dependencies import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
