@@ -109,3 +109,16 @@ button { border: 0; border-radius: 10px; padding: 11px 16px; background: #eee; c
 @media (max-width: 500px) {
     .criteria-average-row { grid-template-columns: minmax(90px, 1fr) minmax(48px, 1fr) 30px; gap: 8px; font-size: 13px; }
 }
+
+
+/* Любимые жанры на основе оценок пользователя */
+.favorite-genres-list { display: grid; gap: 12px; margin-top: 16px; }
+.favorite-genre-row { display: grid; grid-template-columns: minmax(100px, 1fr) minmax(70px, 2fr) 36px auto; gap: 12px; align-items: center; }
+.favorite-genre-row strong { text-align: right; font-variant-numeric: tabular-nums; }
+.favorite-genre-row small { color: #888; white-space: nowrap; }
+.favorite-genre-track { height: 10px; overflow: hidden; border-radius: 999px; background: #303030; }
+.favorite-genre-track span { display: block; height: 100%; border-radius: inherit; background: #8b7cf6; }
+@media (max-width: 600px) {
+    .favorite-genre-row { grid-template-columns: minmax(80px, 1fr) minmax(50px, 1fr) 32px; gap: 8px; font-size: 13px; }
+    .favorite-genre-row small { grid-column: 1 / -1; }
+}
