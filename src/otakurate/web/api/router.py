@@ -8,8 +8,9 @@ from sqlalchemy.orm import Session
 from ...database import SessionLocal
 from ...domain.enums import MediaType
 from ...integrations import ExternalSearchResult, default_registry
-from ...models import RatingProfile
+from ...models import RatingProfile, User
 from ...services.dev_user import get_dev_user
+from ..dependencies import get_current_user
 from ...services.external_import import import_shikimori_rates
 from ...services.external_titles import ensure_external_source, link_external_title
 from ...services.library_entries import add_to_list, get_entry, get_user_lists, update_entry
@@ -39,9 +40,10 @@ class RatingPayload(BaseModel):
 
 
 @router.put("", response_model=dict)
-def upsert_rating(payload: RatingPayload, session: Session = Depends(get_session)):
-    if payload.user_id is None:
-        payload.user_id = get_dev_user(session).id
+def upsert_rating(payload: RatingPayload, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+    if payload.user_id is not None and payload.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot access another user.")
+    payload.user_id = current_user.id
     profile = session.scalar(
         select(RatingProfile)
         .where(
@@ -106,13 +108,14 @@ def create_title_endpoint(
 
 @title_search_router.get("/lists", response_model=list[dict])
 def get_lists_endpoint(
-    user_id: int,
+    user_id: int | None,
     media_type: MediaType,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
-    if user_id is None:
-        user_id = get_dev_user(session).id
-        session.commit()
+    if user_id is not None and user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot access another user.")
+    user_id = current_user.id
     return [
         {"id": item.id, "name": item.name, "is_system": item.is_system}
         for item in get_user_lists(session, user_id=user_id, media_type=media_type)
@@ -129,9 +132,11 @@ class LibraryEntryPayload(BaseModel):
 def add_to_list_endpoint(
     payload: LibraryEntryPayload,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
-    if payload.user_id is None:
-        payload.user_id = get_dev_user(session).id
+    if payload.user_id is not None and payload.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot access another user.")
+    payload.user_id = current_user.id
     try:
         entry = add_to_list(
             session,
@@ -224,9 +229,11 @@ class ShikimoriImportPayload(BaseModel):
 def import_shikimori_endpoint(
     payload: ShikimoriImportPayload,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
-    if payload.user_id is None:
-        payload.user_id = get_dev_user(session).id
+    if payload.user_id is not None and payload.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot access another user.")
+    payload.user_id = current_user.id
     try:
         report = import_shikimori_rates(
             session,
@@ -315,10 +322,11 @@ def get_library_entry_endpoint(
     user_id: int | None,
     title_id: int,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
-    if user_id is None:
-        user_id = get_dev_user(session).id
-        session.commit()
+    if user_id is not None and user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot access another user.")
+    user_id = current_user.id
     entry = get_entry(session, user_id=user_id, title_id=title_id)
     if entry is None:
         raise HTTPException(status_code=404, detail="Library entry not found.")
@@ -336,9 +344,11 @@ def get_library_entry_endpoint(
 def update_library_entry_endpoint(
     payload: LibraryEntryUpdatePayload,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
-    if payload.user_id is None:
-        payload.user_id = get_dev_user(session).id
+    if payload.user_id is not None and payload.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot access another user.")
+    payload.user_id = current_user.id
     try:
         entry = update_entry(
             session,
