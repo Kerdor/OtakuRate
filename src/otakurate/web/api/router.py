@@ -10,7 +10,7 @@ from ...domain.enums import MediaType
 from ...integrations import ExternalSearchResult, default_registry
 from ...models import RatingProfile, User
 from ...services.dev_user import get_dev_user
-from ..dependencies import get_current_user
+from .dependencies import get_current_user
 from ...services.external_import import import_shikimori_rates
 from ...services.external_titles import ensure_external_source, link_external_title
 from ...services.library_entries import add_to_list, get_entry, get_user_lists, update_entry
