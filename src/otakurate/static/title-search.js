@@ -26,11 +26,8 @@ async function searchTitles() {
         }
 
         results.innerHTML = titles.map((title) => (
-            '<a class="search-result" href="/rate?type='
-            + encodeURIComponent(title.media_type)
-            + '&title='
-            + encodeURIComponent(title.title)
-            + '">'
+            '<a class="search-result" href="/title/' + title.id + '">
+            '
             + '<strong>' + escapeHtml(title.title) + '</strong>'
             + '<span>' + (title.media_type === "anime" ? "Аниме" : "Манга") + '</span>'
             + '</a>'
