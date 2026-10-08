@@ -7,10 +7,16 @@ from ...database import SessionLocal
 from ...domain.enums import MediaType
 from ...models import RatingProfile
 from ...services.title_search import search_titles
+from ...services.titles import create_title
 from ...services.user_ratings import save_user_rating
 
 router = APIRouter(prefix="/ratings", tags=["ratings"])
 title_search_router = APIRouter(tags=["titles"])
+
+
+class TitleCreatePayload(BaseModel):
+    title: str
+    media_type: MediaType
 
 
 def get_session():
@@ -66,6 +72,28 @@ def upsert_rating(payload: RatingPayload, session: Session = Depends(get_session
         "rating_profile_version": rating.rating_profile_version,
     }
 
+
+
+@title_search_router.post("/titles", response_model=dict, status_code=201)
+def create_title_endpoint(
+    payload: TitleCreatePayload,
+    session: Session = Depends(get_session),
+):
+    try:
+        title = create_title(
+            session,
+            title=payload.title,
+            media_type=payload.media_type,
+        )
+        session.commit()
+    except ValueError as exc:
+        session.rollback()
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {
+        "id": title.id,
+        "title": title.title,
+        "media_type": title.media_type,
+    }
 
 
 @title_search_router.get("/titles/search", response_model=list[dict])
