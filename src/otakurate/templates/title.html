@@ -12,7 +12,7 @@
             <a class="site-brand" href="/">OtakuRate</a>
             <nav class="site-nav" aria-label="Основная навигация">
                 <a href="/">Главная</a>
-                <a href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}">Оценить</a>
+                <a href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}&title_id={{ title.id }}{% if user_id %}&user_id={{ user_id }}{% endif %}">Оценить</a>
             </nav>
         </header>
 
@@ -58,7 +58,17 @@
                     <a class="button-link" href="/rate?type={{ title.media_type.value }}&title={{ title.title|urlencode }}">Оценить</a>
                 {% endif %}
             </div>
+                {% if user_id %}
+                    <section class="library-add">
+                        <h2>Моя библиотека</h2>
+                        <select id="library-list" aria-label="Список библиотеки"></select>
+                        <button id="library-add-button" type="button">Добавить в список</button>
+                        <p id="library-status" class="muted" aria-live="polite"></p>
+                    </section>
+                {% endif %}
+            </div>
         </article>
     </main>
+{% if user_id %}<script>window.TITLE_DATA = {{ {"id": title.id, "media_type": title.media_type.value, "user_id": user_id}|tojson }};</script><script src="/static/title-card.js"></script>{% endif %}
 </body>
 </html>
