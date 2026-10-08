@@ -27,7 +27,7 @@ class RatingSettingsPayload(BaseModel):
     criteria: dict[str, RatingCriterionSetting] = Field(min_length=1)
 
 
-@router.get("/profile", response_model=dict)
+@router.get("/api/profile", response_model=dict)
 def profile(session: Session = Depends(get_session), user: User = Depends(get_current_user)):
     settings = user.settings or {}
     favorite_ids = settings.get("favorite_title_ids", [])
