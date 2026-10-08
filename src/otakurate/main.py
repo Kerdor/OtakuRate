@@ -4,8 +4,10 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from .config import get_settings
 from .web.api.auth import router as auth_router
+from .web.api.profile import router as profile_api_router
 from .web.api.router import router as api_router, title_search_router
 from .web.pages.index import router as pages_router
+from .web.pages.profile import router as profile_pages_router
 
 settings = get_settings()
 
@@ -24,4 +26,6 @@ app.mount("/static", StaticFiles(directory="src/otakurate/static"), name="static
 app.include_router(pages_router)
 app.include_router(api_router)
 app.include_router(auth_router)
+app.include_router(profile_api_router)
+app.include_router(profile_pages_router)
 app.include_router(title_search_router)
