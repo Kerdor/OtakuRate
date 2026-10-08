@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..domain.enums import MediaType
-from ..models import (
+from ..integrations.base import ExternalCapability, UserListAdapter\nfrom ..models import (
     ExternalSource,
     ExternalTitle,
     Title,
