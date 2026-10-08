@@ -7,11 +7,13 @@ from sqlalchemy.orm import Session
 
 from ...database import SessionLocal
 from ...domain.enums import MediaType
+from ...integrations import ExternalSearchResult, ShikimoriAdapter
 from ...models import RatingProfile
-from ...services.title_search import search_titles
 from ...services.dev_user import get_dev_user
-from ...services.titles import create_title
+from ...services.external_titles import ensure_external_source, link_external_title
 from ...services.library_entries import add_to_list, get_entry, get_user_lists, update_entry
+from ...services.title_search import search_titles
+from ...services.titles import create_title
 from ...services.user_ratings import save_user_rating
 
 router = APIRouter(prefix="/ratings", tags=["ratings"])
@@ -79,7 +81,6 @@ def upsert_rating(payload: RatingPayload, session: Session = Depends(get_session
     }
 
 
-
 @title_search_router.post("/titles", response_model=dict, status_code=201)
 def create_title_endpoint(
     payload: TitleCreatePayload,
@@ -100,7 +101,6 @@ def create_title_endpoint(
         "title": title.title,
         "media_type": title.media_type,
     }
-
 
 
 @title_search_router.get("/lists", response_model=list[dict])
@@ -165,6 +165,94 @@ def search_title_endpoint(
             limit=limit,
         )
     ]
+
+
+@title_search_router.get("/external/shikimori/search", response_model=list[dict])
+def search_shikimori_endpoint(
+    query: str,
+    media_type: MediaType | None = None,
+    limit: int = 20,
+):
+    try:
+        results = ShikimoriAdapter().search_titles(
+            query=query,
+            media_type=media_type,
+            limit=limit,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="Shikimori search failed.",
+        ) from exc
+
+    return [
+        {
+            "external_id": item.external_id,
+            "title": item.title,
+            "media_type": item.media_type,
+            "url": item.url,
+            "alternative_titles": item.alternative_titles,
+            "description": item.description,
+            "cover_url": item.cover_url,
+            "release_date": item.release_date,
+            "metadata": item.metadata,
+        }
+        for item in results
+    ]
+
+
+class ShikimoriLinkPayload(BaseModel):
+    external_id: str
+    title: str
+    media_type: MediaType
+    url: str | None = None
+    alternative_titles: tuple[str, ...] = ()
+    description: str | None = None
+    cover_url: str | None = None
+    release_date: str | None = None
+    metadata: dict = {}
+
+
+@title_search_router.post("/titles/{title_id}/external/shikimori", response_model=dict)
+def link_shikimori_endpoint(
+    title_id: int,
+    payload: ShikimoriLinkPayload,
+    session: Session = Depends(get_session),
+):
+    try:
+        ensure_external_source(
+            session,
+            key="shikimori",
+            name="Shikimori",
+            base_url="https://shikimori.one",
+        )
+        external_title = link_external_title(
+            session,
+            title_id=title_id,
+            source_key="shikimori",
+            result=ExternalSearchResult(
+                external_id=payload.external_id,
+                title=payload.title,
+                media_type=payload.media_type,
+                url=payload.url,
+                alternative_titles=payload.alternative_titles,
+                description=payload.description,
+                cover_url=payload.cover_url,
+                release_date=payload.release_date,
+                metadata=payload.metadata,
+            ),
+        )
+        session.commit()
+    except ValueError as exc:
+        session.rollback()
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {
+        "id": external_title.id,
+        "title_id": external_title.title_id,
+        "external_id": external_title.external_id,
+        "source": "shikimori",
+    }
 
 
 class LibraryEntryUpdatePayload(BaseModel):
