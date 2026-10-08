@@ -11,6 +11,32 @@ def get_profile_summary(session: Session, user_id: int) -> dict:
     rating_count = session.scalar(select(func.count(UserRating.id)).where(UserRating.user_id == user_id)) or 0
     library_count = session.scalar(select(func.count(LibraryEntry.id)).where(LibraryEntry.user_id == user_id)) or 0
     average = session.scalar(select(func.avg(UserRating.overall_rating)).where(UserRating.user_id == user_id))
+    timeline_rows = session.execute(
+        select(UserRating.created_at, UserRating.overall_rating)
+        .where(UserRating.user_id == user_id, UserRating.created_at.is_not(None))
+        .order_by(UserRating.created_at)
+    )
+    timeline_totals = {}
+    for created_at, rating in timeline_rows:
+        month_key = (created_at.year, created_at.month)
+        if month_key not in timeline_totals:
+            timeline_totals[month_key] = {"total": 0, "count": 0}
+        timeline_totals[month_key]["total"] += rating
+        timeline_totals[month_key]["count"] += 1
+
+    rating_timeline = [
+        {
+            "month": f"{year:04d}-{month:02d}",
+            "label": f"{month:02d}.{year}",
+            "average": round(values["total"] / values["count"], 2),
+            "count": values["count"],
+        }
+        for (year, month), values in sorted(timeline_totals.items())
+    ]
+    max_timeline_average = max((item["average"] for item in rating_timeline), default=0)
+    for item in rating_timeline:
+        item["percentage"] = round(item["average"] / 10 * 100)
+
     rating_rows = session.execute(
         select(UserRating.overall_rating, func.count(UserRating.id))
         .where(UserRating.user_id == user_id)
@@ -104,6 +130,7 @@ def get_profile_summary(session: Session, user_id: int) -> dict:
         "library_count": library_count,
         "average_rating": round(float(average), 2) if average is not None else None,
         "rating_distribution": rating_distribution,
+        "rating_timeline": rating_timeline,
         "criteria_averages": criteria_averages,
         "favorite_genres": favorite_genres,
         "anime_rating_count": anime_count,
