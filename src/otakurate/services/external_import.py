@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from ..domain.enums import MediaType
 from ..integrations.base import ExternalCapability, UserListAdapter
-from ..integrations.mapping import map_rating, map_status, normalize_external_id
+from ..integrations.mapping import map_rating, map_status, normalize_external_id, normalize_title_name
 from ..models import (
     ExternalSource,
     ExternalTitle,
@@ -48,7 +48,7 @@ def _parse_date(value: str | None) -> date | None:
 
 
 def _normalize_name(value: str) -> str:
-    return " ".join(value.casefold().split())
+    return normalize_title_name(value)
 
 
 def _find_name_candidates(
