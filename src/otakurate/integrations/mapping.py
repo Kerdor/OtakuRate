@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import re
+import unicodedata
+from dataclasses import dataclass
+
 from ..domain.enums import MediaType
 
 
@@ -20,10 +24,6 @@ def map_media_type(value: MediaType | str) -> MediaType:
         return aliases[normalized]
     except KeyError as exc:
         raise ValueError(f"Unsupported media type: {value!r}") from exc
-
-from dataclasses import dataclass
-import re
-import unicodedata
 
 
 STATUS_MAP: dict[MediaType, dict[str, str]] = {
