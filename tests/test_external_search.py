@@ -1,5 +1,5 @@
 from otakurate.domain.enums import MediaType
-from otakurate.integrations.base import ExternalSearchResult
+from otakurate.integrations.base import ExternalCapability, ExternalSearchResult
 from otakurate.services.external_search import search_external_titles
 
 
@@ -7,7 +7,7 @@ class FakeAdapter:
     key = "fake"
     name = "Fake"
 
-    def __init__(self):
+    capabilities = frozenset({ExternalCapability.SEARCH_TITLES})\n\n    def supports(self, capability):\n        return capability in self.capabilities\n\n    def __init__(self):
         self.calls = []
 
     def search_titles(self, *, query, media_type=None, limit=20):
