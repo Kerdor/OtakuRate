@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 
 from ...database import SessionLocal
 from ...models import User
-from ...services.friends import get_friend_requests, get_friends
+from ...services.friends import can_view_section, get_friend_requests, get_friends
 from ..api.dependencies import get_current_user
 
 templates = Jinja2Templates(directory="src/otakurate/templates")
@@ -28,6 +28,8 @@ async def user_page(request: Request, user_id: int):
     with SessionLocal() as session:
         viewer = get_current_user(request, session)
         target = session.get(User, user_id)
+        if target is not None and (not target.is_active or not can_view_section(session, viewer.id, target, "profile")):
+            target = None
         return templates.TemplateResponse(
             request=request, name="user.html",
             context={"viewer": viewer, "target": target},
