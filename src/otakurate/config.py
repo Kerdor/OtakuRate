@@ -21,15 +21,19 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = Field(default=8000, ge=1, le=65535)
     debug: bool = False
+    session_secret: str | None = None
 
     @model_validator(mode="after")
     def validate_environment(self) -> "Settings":
         if self.environment == "test":
             self.database_url = "sqlite:///:memory:"
             self.debug = False
+            self.session_secret = "test-only-secret"
             return self
 
         if self.environment == "prod":
+            if not self.session_secret or not self.session_secret.strip():
+                raise ValueError("OTAKURATE_SESSION_SECRET is required in production.")
             if not self.database_url or not self.database_url.strip():
                 raise ValueError(
                     "OTAKURATE_DATABASE_URL is required in production."
@@ -39,6 +43,8 @@ class Settings(BaseSettings):
 
         if not self.database_url:
             self.database_url = "sqlite:///./otakurate.db"
+        if not self.session_secret:
+            self.session_secret = "dev-only-change-me"
 
         return self
 
