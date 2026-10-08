@@ -6,7 +6,7 @@ from ...database import SessionLocal
 from ...domain.enums import MediaType
 from ...models import Title, User, UserRating
 from ...services.profile import get_profile_summary, get_rating_settings, save_rating_settings
-from ..dependencies import get_current_user
+from .dependencies import get_current_user
 
 router = APIRouter(tags=["profile"])
 
