@@ -58,3 +58,10 @@ button { border: 0; border-radius: 10px; padding: 11px 16px; background: #eee; c
 
 .library-add { margin-top: 28px; padding: 18px; border: 1px solid #333; border-radius: 12px; display: grid; gap: 10px; }
 .library-add select { max-width: 320px; padding: 8px; }
+
+.library-add label { display: grid; gap: 6px; }
+.library-add input, .library-add select { padding: 8px; }
+.own-criteria { margin-top: 28px; }
+.criteria-values { display: grid; gap: 8px; }
+.criteria-values div { display: flex; justify-content: space-between; gap: 20px; border-bottom: 1px solid #222; padding: 6px 0; }
+.criteria-values dd { margin: 0; font-weight: 600; }
