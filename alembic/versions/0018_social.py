@@ -17,9 +17,9 @@ def upgrade() -> None:
         sa.Column("addressee_id", sa.Integer(), sa.ForeignKey("users.id"), nullable=False),
         sa.Column(
             "status",
-            sa.Enum("pending", "accepted", "rejected", name="friendrequeststatus"),
+            sa.Enum("PENDING", "ACCEPTED", "REJECTED", name="friendrequeststatus"),
             nullable=False,
-            server_default="pending",
+            server_default="PENDING",
         ),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
