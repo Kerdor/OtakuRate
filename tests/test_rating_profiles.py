@@ -345,8 +345,16 @@ def test_library_sorting():
         ])
         session.commit()
 
-        assert [e.id for e in filter_library(session, user_id=user.id)] == [entries[2].id, entries[1].id, entries[0].id]
-        assert [e.id for e in filter_library(session, user_id=user.id, sort=LibrarySort.ADDED_OLDEST)] == [entries[0].id, entries[1].id, entries[2].id]
+        assert [e.created_at for e in filter_library(session, user_id=user.id)] == [
+            entries[2].created_at,
+            entries[1].created_at,
+            entries[0].created_at,
+        ]
+        assert [e.created_at for e in filter_library(session, user_id=user.id, sort=LibrarySort.ADDED_OLDEST)] == [
+            entries[0].created_at,
+            entries[1].created_at,
+            entries[2].created_at,
+        ]
         assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.TITLE_ASC)] == [titles[1].id, titles[2].id, titles[0].id]
         assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.TITLE_DESC)] == [titles[0].id, titles[2].id, titles[1].id]
         assert [e.title_id for e in filter_library(session, user_id=user.id, sort=LibrarySort.RATING_HIGH)] == [titles[1].id, titles[0].id, titles[2].id]
