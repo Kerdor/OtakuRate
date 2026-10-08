@@ -2,20 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ...database import SessionLocal
 from ...models import LibraryEntry, Title, User, UserRating
 from ...services.friends import (
     can_view_section, get_friend_requests, get_friends, get_visibility,
     remove_friend, respond_to_friend_request, send_friend_request,
 )
-from .dependencies import get_current_user
+from .dependencies import get_current_user, get_session
 
 router = APIRouter(tags=["social"])
-
-
-def get_session():
-    with SessionLocal() as session:
-        yield session
 
 
 def _user_summary(user: User) -> dict:
