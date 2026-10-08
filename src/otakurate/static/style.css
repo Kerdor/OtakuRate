@@ -81,3 +81,16 @@ button { border: 0; border-radius: 10px; padding: 11px 16px; background: #eee; c
 @media (max-width: 650px) { .profile-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rating-setting-row { grid-template-columns: 1fr 80px; } .rating-setting-row label:last-child { grid-column: 1 / -1; } .site-header { flex-wrap: wrap; margin-bottom: 36px; } .site-nav { flex-wrap: wrap; } }
 
 .social-row { display: flex; gap: 10px; padding: 10px 0; }
+
+
+/* Распределение пользовательских оценок */
+.rating-distribution-list { display: grid; gap: 8px; margin-top: 16px; }
+.rating-distribution-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 32px; align-items: center; gap: 12px; }
+.rating-distribution-label, .rating-distribution-count { color: #bbb; font-size: 14px; font-variant-numeric: tabular-nums; }
+.rating-distribution-count { text-align: right; }
+.rating-distribution-track { height: 12px; overflow: hidden; border-radius: 999px; background: #303030; }
+.rating-distribution-track span { display: block; height: 100%; border-radius: inherit; background: #8b7cf6; }
+@media (max-width: 600px) {
+    .profile-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rating-distribution-row { gap: 8px; }
+}
