@@ -1,9 +1,9 @@
 from fastapi import HTTPException, Request
 from sqlalchemy.orm import Session
 
-from ..config import get_settings
-from ..models import User
-from ..services.dev_user import get_dev_user
+from ...config import get_settings
+from ...models import User
+from ...services.dev_user import get_dev_user
 
 
 def get_current_user(request: Request, session: Session) -> User:
