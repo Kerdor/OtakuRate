@@ -5,12 +5,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ...database import SessionLocal
 from ...domain.enums import MediaType
 from ...integrations import ExternalSearchResult, default_registry
 from ...models import RatingProfile, User
 from ...services.dev_user import get_dev_user
-from .dependencies import get_current_user
+from .dependencies import get_current_user, get_session
 from ...services.external_import import import_shikimori_rates
 from ...services.external_titles import ensure_external_source, link_external_title
 from ...services.library_entries import add_to_list, get_entry, get_user_lists, update_entry
@@ -25,11 +24,6 @@ title_search_router = APIRouter(tags=["titles"])
 class TitleCreatePayload(BaseModel):
     title: str
     media_type: MediaType
-
-
-def get_session():
-    with SessionLocal() as session:
-        yield session
 
 
 class RatingPayload(BaseModel):
