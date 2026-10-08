@@ -1,8 +1,15 @@
 import pytest
 
+from otakurate.config import get_settings
 from otakurate.database import SessionLocal
 from otakurate.models import User
 from otakurate.services.dev_user import get_dev_user
+
+
+@pytest.fixture(autouse=True)
+def enable_dev_user(monkeypatch):
+    # Keep the test database configured as "test", but enable the dev-only service.
+    monkeypatch.setattr(get_settings(), "environment", "dev")
 
 
 def test_dev_user_is_created_and_reused():
