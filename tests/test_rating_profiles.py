@@ -286,6 +286,75 @@ def test_library_filters_are_optional_and_combinable():
         ) == [anime_entry]
 
 
+def test_library_search_by_title():
+    from otakurate.database import SessionLocal
+    from otakurate.domain.enums import MediaType
+    from otakurate.models import Title, User
+    from otakurate.services.library import LibraryFilters, filter_library
+
+    with SessionLocal() as session:
+        user = User(username="search-user")
+        session.add(user)
+        session.flush()
+
+        titles = [
+            Title(title="Attack on Titan", media_type=MediaType.ANIME),
+            Title(title="Vinland Saga", media_type=MediaType.ANIME),
+            Title(title="One Piece", media_type=MediaType.MANGA),
+        ]
+        session.add_all(titles)
+        session.flush()
+
+        user_list = UserList(
+            user_id=user.id,
+            media_type=MediaType.ANIME,
+            name="Watching",
+            system_key="watching",
+            is_system=True,
+        )
+        manga_list = UserList(
+            user_id=user.id,
+            media_type=MediaType.MANGA,
+            name="Reading",
+            system_key="reading",
+            is_system=True,
+        )
+        session.add_all([user_list, manga_list])
+        session.flush()
+
+        entries = [
+            LibraryEntry(user_id=user.id, title_id=titles[0].id, list_id=user_list.id),
+            LibraryEntry(user_id=user.id, title_id=titles[1].id, list_id=user_list.id),
+            LibraryEntry(user_id=user.id, title_id=titles[2].id, list_id=manga_list.id),
+        ]
+        session.add_all(entries)
+        session.commit()
+
+        assert [e.title_id for e in filter_library(
+            session,
+            user_id=user.id,
+            filters=LibraryFilters(search="attack"),
+        )] == [titles[0].id]
+
+        assert [e.title_id for e in filter_library(
+            session,
+            user_id=user.id,
+            filters=LibraryFilters(search="SAGA"),
+        )] == [titles[1].id]
+
+        assert [e.title_id for e in filter_library(
+            session,
+            user_id=user.id,
+            filters=LibraryFilters(search=""),
+        )] == [titles[2].id, titles[1].id, titles[0].id]
+
+        assert [e.title_id for e in filter_library(
+            session,
+            user_id=user.id,
+            filters=LibraryFilters(search="one", media_type=MediaType.MANGA),
+        )] == [titles[2].id]
+
+
 def test_library_sorting():
     from datetime import datetime, timezone
 
