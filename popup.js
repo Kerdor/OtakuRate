@@ -88,19 +88,49 @@ function renderCriteria(criteria) {
 
 async function init() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.url) {
+  if (!tab?.id || !tab.url) {
     byId("notOnTitle").classList.remove("hidden");
     return;
   }
 
-  const tabUrl = new URL(tab.url);
-  if (!["shikimori.one", "shikimori.me", "shikimori.org"].includes(tabUrl.hostname)) {
+  let tabUrl;
+  try {
+    tabUrl = new URL(tab.url);
+  } catch {
     byId("notOnTitle").classList.remove("hidden");
     return;
   }
 
-  const { currentShikimoriTitle } = await chrome.storage.local.get("currentShikimoriTitle");
-  if (!currentShikimoriTitle || new URL(currentShikimoriTitle.url).pathname !== tabUrl.pathname) {
+  if (!["shikimori.one", "www.shikimori.one", "shikimori.me", "www.shikimori.me", "shikimori.org", "www.shikimori.org"].includes(tabUrl.hostname)) {
+    byId("notOnTitle").classList.remove("hidden");
+    return;
+  }
+
+  // Request fresh data from the active page instead of relying only on stale storage.
+  let currentShikimoriTitle = null;
+  try {
+    const response = await chrome.tabs.sendMessage(tab.id, { type: "OTAKURATE_GET_TITLE" });
+    currentShikimoriTitle = response?.title || null;
+  } catch {
+    // The content script may not have run on a tab that was already open when the extension was installed.
+  }
+
+  if (!currentShikimoriTitle) {
+    const stored = await chrome.storage.local.get("currentShikimoriTitle");
+    const candidate = stored.currentShikimoriTitle;
+    if (candidate?.url) {
+      try {
+        const candidateUrl = new URL(candidate.url);
+        if (candidateUrl.origin === tabUrl.origin && candidateUrl.pathname === tabUrl.pathname) {
+          currentShikimoriTitle = candidate;
+        }
+      } catch {
+        // Ignore malformed stale storage.
+      }
+    }
+  }
+
+  if (!currentShikimoriTitle) {
     byId("notOnTitle").classList.remove("hidden");
     return;
   }
