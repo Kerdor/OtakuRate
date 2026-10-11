@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "OtakuRate",
+  "version": "0.1.0",
+  "description": "Личный каталог и оценки аниме, манги и манхвы на Shikimori",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": [
+    "https://shikimori.one/*",
+    "https://shikimori.me/*",
+    "https://shikimori.org/*"
+  ],
+  "action": {
+    "default_title": "OtakuRate",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://shikimori.one/animes/*",
+        "https://shikimori.one/mangas/*",
+        "https://shikimori.me/animes/*",
+        "https://shikimori.me/mangas/*",
+        "https://shikimori.org/animes/*",
+        "https://shikimori.org/mangas/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html"
+}

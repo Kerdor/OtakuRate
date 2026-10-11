@@ -1,27 +1,19 @@
-# OtakuRate
+# OtakuRate — расширение для Яндекс Браузера
 
-Personal anime and manga rating platform.
+Расширение для личного каталога и субъективной оценки аниме, манги и манхвы. Первая интеграция — Shikimori.
 
-## Initial direction
+## Возможности первой версии
+- определение открытого тайтла на Shikimori;
+- оценки по критериям от 0 до 10;
+- отдельные наборы критериев для аниме и манги;
+- комментарий к тайтлу;
+- локальное сохранение в браузере.
 
-- Web application first
-- Subjective rating system for anime and manga/manhwa
-- Separate title records from user ratings
-- External source identifiers kept separately from OtakuRate data
-- Future integrations through adapters
-- Future browser extension for account/list synchronization
+## Установка в Яндекс Браузер
+1. Скачай репозиторий или ветку \`extension-rebuild\`.
+2. Открой \`browser://extensions\`.
+3. Включи «Режим разработчика».
+4. Нажми «Загрузить распакованное расширение» и выбери папку, в которой находится \`manifest.json\`.
 
-## Stack
-
-- Python
-- FastAPI
-- SQLAlchemy
-- SQLite for the initial local database
-- Server-rendered HTML with Jinja2
-
-## Run
-
-```bash
-pip install -e .
-uvicorn otakurate.main:app --reload
-```
+## Важно
+Сейчас это локальный прототип: серверной регистрации, межустройственной синхронизации, полноценного каталога и редактирования весов пока нет. Они предусмотрены в roadmap.

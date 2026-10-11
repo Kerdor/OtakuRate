@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OtakuRate</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">OtakuRate</div>
+    <button id="openOptions" class="icon-button" title="Настройки" aria-label="Настройки">⚙</button>
+  </header>
+  <main>
+    <section id="notOnTitle" class="empty hidden">
+      <h2>Тайтл не найден</h2>
+      <p>Открой страницу аниме или манги на Shikimori и снова нажми на значок OtakuRate.</p>
+    </section>
+    <section id="ratingView" class="hidden">
+      <div class="title-card">
+        <img id="cover" alt="Обложка тайтла" class="cover hidden">
+        <div class="title-meta">
+          <div id="mediaType" class="eyebrow"></div>
+          <h1 id="title"></h1>
+          <p id="details" class="muted"></p>
+          <a id="sourceLink" target="_blank" rel="noreferrer">Открыть на Shikimori ↗</a>
+        </div>
+      </div>
+      <div class="section-heading">
+        <h2>Моя оценка</h2>
+        <span id="overall" class="overall">0,0</span>
+      </div>
+      <p class="hint">Выставь целые оценки от 0 до 10. Итог пока считается как среднее арифметическое.</p>
+      <div id="criteria" class="criteria"></div>
+      <label class="review-label" for="review">Комментарий (необязательно)</label>
+      <textarea id="review" rows="3" placeholder="Что думаешь о тайтле?"></textarea>
+      <button id="save" class="primary">Сохранить оценку</button>
+      <p id="status" class="status" role="status"></p>
+    </section>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
