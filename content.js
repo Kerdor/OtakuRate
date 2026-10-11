@@ -2,13 +2,14 @@
   const supportedHosts = new Set([
     "shikimori.one", "www.shikimori.one",
     "shikimori.me", "www.shikimori.me",
-    "shikimori.org", "www.shikimori.org"
+    "shikimori.org", "www.shikimori.org",
+    "shikimori.io", "www.shikimori.io"
   ]);
 
   function readTitle() {
     if (!supportedHosts.has(location.hostname)) return null;
 
-    const match = location.pathname.match(/^\/(animes|mangas)\/(\d+)(?:-|\/|$)/);
+    const match = location.pathname.match(/^\/(animes|mangas)\/([a-z]?\d+)(?:-|\/|$)/i);
     if (!match) return null;
 
     const [, pathType, id] = match;

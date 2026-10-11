@@ -101,7 +101,7 @@ async function init() {
     return;
   }
 
-  if (!["shikimori.one", "www.shikimori.one", "shikimori.me", "www.shikimori.me", "shikimori.org", "www.shikimori.org"].includes(tabUrl.hostname)) {
+  if (!["shikimori.one", "www.shikimori.one", "shikimori.me", "www.shikimori.me", "shikimori.org", "www.shikimori.org", "shikimori.io", "www.shikimori.io"].includes(tabUrl.hostname)) {
     byId("notOnTitle").classList.remove("hidden");
     return;
   }
